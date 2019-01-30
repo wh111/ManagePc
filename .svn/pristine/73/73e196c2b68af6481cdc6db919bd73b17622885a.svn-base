@@ -1,0 +1,490 @@
+<template>
+    <div>
+        <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="160px">
+            <el-form-item label="教材版本名称：">
+                {{ value.dialogData.name }}
+            </el-form-item>
+            <el-form-item label="阶段：" prop="stage">
+                <el-select v-model="formValidate.stage" placeholder="请选择" @change="stageChange">
+                    <el-option label="小学" value="0"></el-option>
+                    <el-option label="初中" value="1"></el-option>
+                    <el-option label="高中" value="2"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="学制：" prop="length">
+                <el-select :disabled="formValidate.stage > 1 || formValidate.grade > 9" v-model="formValidate.length" placeholder="请选择" @change="selectChange">
+                    <el-option label="六三制" value="0"></el-option>
+                    <el-option label="五四制" value="1"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="学期：" prop="term">
+                <el-select v-model="formValidate.term" placeholder="请选择" @change="selectChange">
+                    <el-option label="上学期" value="0"></el-option>
+                    <el-option label="下学期" value="1"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="年级：" prop="grade">
+                <el-select size="small" v-model="formValidate.grade" placeholder="" @change="selectChange">
+                    <el-option v-if="formValidate.stage == '0' && formValidate.length == '0'" v-for="item in ['1','2','3','4','5','6']" :label="item | grade" :value="item" :key="item"></el-option>
+                    <el-option v-if="formValidate.stage == '0' && formValidate.length == '1'" v-for="item in ['1','2','3','4','5']" :label="item | grade" :value="item" :key="item"></el-option>
+                    <el-option v-if="formValidate.stage == '1' && formValidate.length == '0'" v-for="item in ['7','8','9']" :label="item | grade" :value="item" :key="item"></el-option>
+                    <el-option v-if="formValidate.stage == '1' && formValidate.length == '1'" v-for="item in ['6','7','8','9']" :label="item | grade" :value="item" :key="item"></el-option>
+                    <el-option v-if="formValidate.stage == '2'" v-for="item in ['10','11','12']" :label="item | grade" :value="item" :key="item"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="科目：" prop="subject">
+                <el-select v-model="formValidate.subject" placeholder="请选择" @change="selectChange">
+                    <el-option v-for="(item,index) in subjectList" :key="index" :label="item.value"
+                               :value="item.code"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="教材内容">
+                <div class="csma-chartContainer-content">
+                    <!--v-if="chartContainer"-->
+                    <div style="height:330px;">
+                        <div id="chart-container" v-loading="!chartContainer" v-if="chartContainer"></div>
+                    </div>
+                    <div id="edit-panel" class="view-state">
+                        <!-- <span id="chart-state-panel" class="radio-panel">
+                            <input type="radio" name="chart-state" id="rd-view" value="view" checked="true"><label for="rd-view">View</label>
+                            <input type="radio" name="chart-state" id="rd-edit" value="edit">
+                            <label for="rd-edit">Edit</label>
+                        </span> -->
+                        <el-form inline label-width="100px">
+                            <!--<el-form-item label="选择节点">-->
+                            <!--<el-input></el-input>-->
+                            <!--</el-form-item>-->
+                            <el-form-item label="章节名称">
+                                <el-input v-model="chapter" placeholder="请输入第几章"></el-input>
+                                <el-input v-model="chapterText" placeholder="请章节名称"></el-input>
+                            </el-form-item>
+                            <button type="button" @click="addContent">添加</button>
+                            <br/>
+                            <el-form-item label="选择章节">
+                                <el-select v-model="chapterName" placeholder="请选择">
+                                    <el-option v-for="(item,index) in datascource.children" :key="index"
+                                               :label="item.name"
+                                               :value="item.name"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <br/>
+                            <el-form-item label="选择知识点">
+                                <el-select v-model="knowledgeId" placeholder="请选择" @change="knowledgeChange">
+                                    <el-option v-for="(item,index) in knowledgeList" :key="index" :label="item.name"
+                                               :value="item.id"></el-option>
+                                </el-select>
+                                <el-input placeholder="请输入掌握程度" v-model="leaf"></el-input>
+                                <button type="button" @click="addChapter">添加</button>
+                            </el-form-item>
+                        </el-form>
+                        <!--<label class="selected-node-group">选择节点:</label>-->
+                        <!--<input type="text" id="selected-node" class="selected-node-group">-->
+                        <!--<label>添加节点名称:</label>-->
+                        <!--<ul id="new-nodelist" style="margin-right: 190px;float: right">-->
+                        <!--<li>-->
+                        <!--<input type="text" class="new-node">-->
+                        <!--<input v-if="isLeaf" style="width:150px" placeholder="请输入掌握程度" v-model="leaf" type="text"></input>-->
+                        <!--<button type="button" @click="addContent">添加</button>-->
+                        <!--</li>-->
+                        <!--</ul>-->
+                        <!--<br>-->
+                        <!--<span id="node-type-panel" class="radio-panel">-->
+                        <!--<input type="radio" name="node-type" id="rd-child" @click="choice('children')"-->
+                        <!--value="children"><label for="rd-child">子节点</label>-->
+                        <!--</span>-->
+                        <!--<button type="button" @click="addContent">添加</button>-->
+                        <!-- <button type="button" @click="removeContent">删除</button> -->
+                    </div>
+                </div>
+            </el-form-item>
+            <el-form-item style="margin-left:30%">
+                <!-- <el-button size="small" type="primary" @click="save">确定</el-button> -->
+                <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+                <el-button size="small" type="info" @click="cancel">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<script>
+    let Util = null;
+    import $ from 'jquery'
+    import '../../../assets/lib-orgchart/js/jquery.orgchart'
+    //import '../../../assets/lib-orgchart/js/html2canvas.min.js'
+    import api from './api'
+    import {add as rules} from './rules'
+
+    export default {
+        props: {
+            value: Object,
+            that: Object
+        },
+        data() {
+            return {
+                rules,
+                tName: '',
+                leaf: '',
+                chapterName: '',
+                chapterText:'',
+                grade: '',
+                chapter: '',
+                knowledgeId: '',
+                knowledgeName: '',
+                knowledgeList: [],
+                subjectList: [],
+                subjectListObj: {},
+                chartContainer: true,
+                isLeaf: false,
+                loadBtn: {title: '提交', callParEvent: 'listenSubEvent'},
+                formValidate: {
+                    textbookVersionId: this.value.dialogData.id,
+                    name: '',
+                    stage: '0',
+                    length: '0',
+                    grade: '1',
+                    term: '0',
+                    subject: '',
+                    contentTree: {
+                        types: "A",
+                        leaf: false,
+                        children: null
+                    }
+                },
+                isKnowledge: false,
+                datascource: {
+                    types: "A",
+                    leaf: false,
+                    children: null
+                },
+                addMessTitle: {
+                    type: 'add',
+                    callback: 'close',
+                    successTitle: '新增成功!',
+                    errorTitle: '新增失败!',
+                    ajaxSuccess: 'ajaxSuccess',
+                    ajaxError: 'ajaxError',
+                    ajaxParams: {
+                        url: api.add.path,
+                        method: api.add.method,
+                        jsonString: true,
+                        data: {}
+                    }
+                }
+            }
+        },
+        created() {
+//            this.getKnowleList();
+            this.subjectList = this.that.$store.getters['app/gradeMap'](this.formValidate.grade);
+            let subjectListObj = {};
+            this.that.$store.getters['app/gradeMap'](12).map(item => subjectListObj[item.code] = item);
+            this.subjectListObj = subjectListObj;
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                let that = this;
+                this.chartContainer = true;
+                this.$nextTick(function () {
+                        $('#chart-container').orgchart({
+                                'data': that.datascource,
+                                'exportButton': false,
+                                'exportFilename': 'SportsChart',
+                                'parentNodeSymbol': 'fa-th-large',
+                                'createNode': function ($node, data) {
+                                    $node.on('click', function (event) {
+                                        if (!$(event.target).is('.edge')) {
+                                            that.tName = data.name;
+                                            $('#selected-node').val(data.name).data('node', $node);
+                                            that.tName != that.datascource.name ? that.isLeaf = true : that.isLeaf = false;
+                                        }
+                                    })
+                                }
+                            })
+                            .on('click', '.orgchart', function (event) {
+                                if (!$(event.target).closest('.node').length) {
+                                    $('#selected-node').val('');
+                                }
+                            });
+                        $('.orgchart').find('tr').removeClass('hidden')
+                            .find('td').removeClass('hidden')
+                            .find('.node').removeClass('slide-up slide-down slide-right slide-left');
+                    }
+                )
+            },
+            stageChange() {
+                if (this.formValidate.stage == '0') {
+                    this.formValidate.grade = '1'
+                } else if (this.formValidate.stage == '1') {
+                    this.formValidate.grade = '7'
+                } else {
+                    this.formValidate.grade = '10'
+                }
+                this.selectChange()
+            },
+            knowledgeChange(val) {
+                let that = this;
+                this.knowledgeList.map(function (item) {
+                    if (item.id == val) {
+                        that.knowledgeName = item.name
+                    }
+                })
+            },
+            selectChange() {
+                let str2 = '';
+                switch (this.formValidate.grade) {
+                    case '1':
+                        str2 = '一年级';
+                        break;
+                    case '2':
+                        str2 = '二年级';
+                        break;
+                    case '3':
+                        str2 = '三年级';
+                        break;
+                    case '4':
+                        str2 = '四年级';
+                        break;
+                    case '5':
+                        str2 = '五年级';
+                        break;
+                    case '6':
+                        str2 = '六年级';
+                        break;
+                    case '7':
+                        str2 = '七年级';
+                        break;
+                    case '8':
+                        str2 = '八年级';
+                        break;
+                    case '9':
+                        str2 = '九年级';
+                        break;
+                    case '10':
+                        str2 = '高一';
+                        break;
+                    case '11':
+                        str2 = '高二';
+                        break;
+                    case '12':
+                        str2 = '高三';
+                        break;
+                }
+                this.grade = str2;
+                this.subjectList = this.that.$store.getters['app/gradeMap'](this.formValidate.grade);
+                if (this.formValidate.stage != '' && this.formValidate.term != '' && this.formValidate.subject != '') {
+
+                    this.chartContainer = false;
+                    let str1 = '';
+                    let str3 = this.subjectListObj[this.formValidate.subject].value;
+                    this.formValidate.term == '0' ? str1 = '上学期' : str1 = '下学期';
+                    this.datascource.name = this.value.dialogData.name + '-' + this.grade + '-' + str1 + '-' + str3;
+                    this.formValidate.contentTree.name = this.value.dialogData.name + '-' + this.grade + '-' + str1 + '-' + str3;
+                    let that = this;
+                    setTimeout(function () {
+                        that.init()
+                    }, 200)
+                }
+                this.getKnowleList()
+            },
+            /**
+             * 获取章节对应知识点
+             * ***/
+            getKnowleList(){
+                this.ajax({
+                    ajaxSuccess: res => this.knowledgeList = res.data,
+                    ajaxParams: {
+                        url: '/knowledge/all',
+                        method: 'get',
+                        params: {
+                            subject: this.formValidate.subject,
+                            term:this.formValidate.term
+                        }
+                    }
+                });
+            },
+            // removeContent(item) {//删除节点
+            //     var $node = $('#selected-node').data('node');
+            //     if (!$node) {
+            //         this.errorMess('请选择删除的节点！')
+            //         return;
+            //     }
+            //     $('#chart-container').orgchart('removeNodes', $node);
+            //     $('#selected-node').data('node', null);
+            // },
+            addContent() {//添加节点
+                if (this.chapter == '' || this.chapterText == '') {
+                    this.errorMess('请输入您要添加的章节名称！')
+                    return false;
+                }
+                let that = this;
+                if (this.datascource.children == null || that.datascource.children == undefined) {
+                    this.datascource.children = [];
+                    this.formValidate.contentTree.children = []
+                }
+                this.datascource.children.push({
+                    'name': this.chapter + ' - ' + this.chapterText,
+                    'types': 'B',
+                    'leaf': false
+                })
+                this.formValidate.contentTree.children.push({
+                    'name': this.chapter,
+                    'types': 'B',
+                    'chapterText':this.chapterText,
+                    'leaf': false
+                })
+                this.chartContainer = false;
+                setTimeout(function () {
+                    that.init()
+                }, 200)
+            },
+            addChapter() {
+                let that = this;
+                let patt = new RegExp("^[0-9]*[1-9][0-9]*$");
+                if(!patt.test(this.leaf)){
+                    this.errorMess('掌握程度必须为整数！');
+                    return false
+                };
+                for (let i = 0; i < this.datascource.children.length; i++) {
+                    if (this.datascource.children[i].name == this.chapterName) {
+                        if (this.datascource.children[i].children == null || this.datascource.children[i].children == undefined) {
+                            this.datascource.children[i].children = [];
+                            this.formValidate.contentTree.children[i].children = []
+                        }
+                        if(this.datascource.children[i].children.length >0){
+                            this.datascource.children[i].children.map(item =>{
+                                if(item.name.indexOf(that.knowledgeName) >= 0){
+                                    that.errorMess('您已添加过该知识点，不能重复添加！');
+                                    return false
+                                }else{
+                                    this.datascource.children[i].children.push({
+                                        'name': this.knowledgeName + ' --- ' + this.leaf,
+                                        'types': 'C',
+                                        'level': this.leaf
+                                    })
+                                    this.formValidate.contentTree.children[i].children.push({
+                                        'knowledgeId': this.knowledgeId,
+                                        'name': this.knowledgeName,
+                                        'types': 'C',
+                                        'level': this.leaf
+                                    })
+                                }
+                            })
+                        }else{
+                            this.datascource.children[i].children.push({
+                                'name': this.knowledgeName + ' --- ' + this.leaf,
+                                'types': 'C',
+                                'level': this.leaf
+                            })
+                            this.formValidate.contentTree.children[i].children.push({
+                                'knowledgeId': this.knowledgeId,
+                                'name': this.knowledgeName,
+                                'types': 'C',
+                                'level': this.leaf
+                            })
+                        }
+                    }
+                }
+                this.chartContainer = false;
+                setTimeout(function () {
+                    that.init()
+                }, 200)
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 点击提交按钮 监听是否提交数据
+            * @param isLoadingFun boolean  form表单验证是否通过
+            * */
+            listenSubEvent(isLoadingFun) {
+                let isSubmit = this.submitForm("formValidate");
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+//          this.formValidate.contentTree = this.datascource;
+                    delete this.formValidate.contentTree.relationship;
+                    this.formValidate.name = this.value.dialogData.name;
+//                    console.log(this.formValidate.contentTree)
+                    this.addMessTitle.ajaxParams.data = this.getFormData(this.formValidate);
+                    this.ajax(this.addMessTitle, isLoadingFun)
+                }
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = Util._.defaultsDeep({}, data);
+                return myData;
+            },
+            cancel() {
+                this.$emit('confirm')
+            }
+        },
+        mounted() {
+            // this.$nextTick(function () {
+            //     this.init()
+            // })
+        }
+    }
+</script>
+<style lang="scss">
+    .csma-chartContainer-content {
+        .el-input {
+            width: 230px;
+        }
+        .rigth {
+            margin-right: 400px;
+        }
+        .el-input--suffix {
+            width: 150px !important;
+        }
+    }
+
+</style>
+
+<style lang="css" scoped>
+    @import '../../../assets/lib-orgchart/css/jquery.orgchart.css';
+    @import '../../../assets/lib-orgchart/css/style.css';
+
+    .csma-chartContainer-content .el-input {
+        width: 230px;
+    }
+    #edit-panel{
+       margin-top: 68px;
+    }
+    #chart-container {
+        background-color: #eee;
+        height: auto;
+    }
+
+    .orgchart > table:first-child {
+        margin: 20px auto;
+    }
+
+    .oc-export-btn {
+        display: none !important;
+    }
+
+    .orgchart table {
+        border-spacing: 0 !important;
+        border-collapse: separate !important;
+    }
+
+    .orgchart td {
+        text-align: center;
+        vertical-align: top;
+        padding: 0;
+    }
+</style>

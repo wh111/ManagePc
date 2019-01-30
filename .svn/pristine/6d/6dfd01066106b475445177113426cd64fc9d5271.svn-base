@@ -1,0 +1,39 @@
+<template>
+  <div>
+    <el-form ref="formValidate" v-model="formValidate" class="demo-ruleForm" label-width="140px">
+        <el-form-item label="填写反馈：">
+            <el-input type="textarea" :rows="4" v-model="formValidate.desc"></el-input>
+        </el-form-item>
+        <el-form-item style="margin-left:30%">
+          <el-button class="search-btn" @click="submit">确定</el-button>
+          <el-button class="tableMakeItemCancel" @click="cancel">取消</el-button>
+        </el-form-item>
+    </el-form>
+  </div>
+</template>
+<script>
+let Util = null;
+export default {
+    data(){
+        return{
+            formValidate:{
+                desc:''
+            }
+        }
+    },
+    created(){
+        this.init()
+    },
+    methods:{
+        init(){
+            Util = this.$util;
+        },
+        submit(){
+            this.$emit('cancel','notPass');
+        },
+        cancel(){
+            this.$emit('cancel','notPass');
+        }
+    }
+}
+</script>

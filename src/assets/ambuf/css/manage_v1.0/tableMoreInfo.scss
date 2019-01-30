@@ -1,0 +1,52 @@
+.tableMoreInfo {
+    border: none;
+    overflow: hidden;
+    .el-collapse-item__header__arrow {
+        display: none
+    }
+    .el-form-item {
+        margin-bottom: 0;
+    }
+    .el-input {
+        width: 100%;
+    }
+    .el-input__inner {
+        padding-right: 0;
+    }
+    .el-button {
+        margin: 2px 0;
+    }
+    .qrImg {
+        max-width: 80%;
+        max-height: 110px;
+    }
+    .describeBox {
+        width: 100%;
+        padding-right: 10px;
+        .el-form-item__content {
+            width: 78%
+        }
+    }
+    .el-collapse-item__header {
+        .tableMoreInfoTitle {
+            padding-left: 0
+        }
+    }
+    .tableMoreInfoTitle {
+        height: 43px;
+        line-height: 43px;
+        padding-left: 20px;
+        span {
+            margin-right: 20px;
+        }
+    } // 激活状态
+    .is-active {
+        .el-collapse-item__header {
+            font-weight: bold;
+            background-color: #f7ba2a;
+        }
+        .el-collapse-item__content {
+            background-color: #fff7e3;
+        }
+    }
+}

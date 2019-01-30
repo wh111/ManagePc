@@ -1,0 +1,622 @@
+<template>
+    <div class="moudle-wrap modal clearfix cusccl_content" id="content" ref="content">
+        <el-col>
+            <div>
+                <el-form :model="formValidate" :rules="rules" ref="formValidate" class="demo-ruleForm search-from"
+                         inline style="padding-left: 10px">
+                    <el-row>
+                        <!--<el-col :span="10" >-->
+
+                        <!--</el-col>-->
+                        <el-col :span="14" align="left">
+                            <el-form-item prop="account" label="学生账号：">
+                                <el-input style="width: 195px;" size="small" v-model="formValidate.account"
+                                          placeholder="学生账号">
+                                    <el-button @click="searchEvent" slot="append" icon="el-icon-search"></el-button>
+                                </el-input>
+                            </el-form-item>
+                          <el-button class="tableMakeItem"
+                                     style="margin-top: 1px;border-color: #d8dce5 !important;height: 30px !important;"
+                                     :icon="searchMore ? 'arrow-down' : 'arrow-up'" @click="showSearchMore">筛选
+                            </el-button>
+                        </el-col>
+                    </el-row>
+                    <div v-if="searchMore" ref="searchMore" style="text-align: left">
+                        <el-form-item label="年级：" prop="grade">
+                            <el-select size="small" v-model="formValidate.grade" placeholder="请选择">
+                                <el-option label="全部" value=""></el-option>
+                                <grade-option></grade-option>
+                            </el-select>
+                        </el-form-item>
+
+                        <el-form-item label="教材：" prop="textbookVersionId">
+                            <el-select filterable v-model="formValidate.textbookVersionId" placeholder="请选择">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option v-for="(item,index) in textbookLsit" :key="item.id" :label="item.name"
+                                           :value="item.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="区域：">
+                            <v-distpicker @province="getProvince" @city="getCity" :province="formValidate.province"
+                                          :city="formValidate.town" hide-area></v-distpicker>
+                        </el-form-item>
+                        <el-form-item label="状态：" prop="accountStatus">
+                            <el-select filterable v-model="formValidate.accountStatus" placeholder="请选择">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option label="正常" value="0"></el-option>
+                                <el-option label="冻结" value="1"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="会员状态：" prop="vipStatus">
+                            <el-select filterable v-model="formValidate.vipStatus" placeholder="请选择">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option label="会员" value="1"></el-option>
+                                <el-option label="普通用户" value="0"></el-option>
+                            </el-select>
+                        </el-form-item>
+                      <el-button type="success" class="search-btn" @click="searchEvent">查询</el-button>
+
+                    </div>
+                  <el-col :span="14" style="margin-top:20px;margin-left: -14px;margin-bottom: 20px">
+                      <el-button size="small" class="greenButton" @click="add">添加学生</el-button>
+                        <el-button size="small" class="orangeButton" @click="toChannel">导入学生</el-button>
+                        <span class="tip"><i>!</i>导入学生请先下载模板</span>
+                    </el-col>
+                </el-form>
+            </div>
+
+            <div id="myTable" ref="myTable">
+                <el-table
+                  sortable="custom"
+                  @sort-change="sortChange"
+                  align="center" :context="self" :height="dynamicHt" :data="tableData"
+                  style="width: 100%" @selection-change="handleSelectionChange"
+                >
+                  <el-table-column type="selection" width="50" align="center"></el-table-column>
+                  <el-table-column prop="index" align="center" label="序号" width="70px"
+                                   show-overflow-tooltip></el-table-column>
+                    <el-table-column
+                            prop="name"
+                            label="姓名"
+                            show-overflow-tooltip
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="sex"
+                            label="性别"
+                            show-overflow-tooltip
+                            align="center"
+                            width="60px"
+                    >
+                        <template slot-scope="scope">
+                            {{scope.row.sex | sex}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="lastLoginStatus"
+                            label="近期登录"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            {{scope.row.lastLoginTime | formatDate}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="grade"
+                            label="年级"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            {{scope.row.grade | grade}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="town"
+                            label="所属市区"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="account"
+                            label="账号"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="wechat"
+                            label="微信状态"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            未绑定
+                            <!--<span v-if="scope.row.wechat == null">未绑定</span>-->
+                            <!--<span v-else>{{scope.row.wechat}}</span>-->
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="accountStatus"
+                            label="状态"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            {{scope.row.accountStatus | accountStatus}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="vipStatus"
+                            label="会员状态"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                          <span v-if="scope.row.vipStatus == 1">
+                            到期时间：{{scope.row.vipExpireTime | formatDate }}
+                          </span>
+                          <el-button class="tableMakeItem" v-else :disabled="scope.row.accountStatus == 1"
+                                     @click="addVip(scope.row.id)">
+                                升为会员
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" width="240">
+                        <template slot-scope="scope">
+                          <el-button class="tableMakeItem" size="small" @click="show(scope.row)">查看</el-button>
+                          <el-button class="tableMakeItem" :disabled="scope.row.accountStatus == 1" size="small"
+                                       @click="edit(scope.row)">修改
+                            </el-button>
+                          <el-button class="tableMakeItem" v-if="scope.row.accountStatus == '0'" size="small"
+                                     @click="enable1(scope.row)">冻结
+                            </el-button>
+                          <el-button v-else size="small" @click="enable2(scope.row)">恢复</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="margin: 10px 50px 10px 0;">
+                    <div style="float: right;">
+                        <el-pagination
+                                @size-change="changePageSize"
+                                @current-change="changePage"
+                                :current-page.sync="myPages.currentPage"
+                                :page-size="myPages.pageSize"
+                                layout="total,prev, pager, next, jumper"
+                                :total="totalCount">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
+        </el-col>
+        <!--查看-->
+        <Modal
+                :mask-closable="false"
+                close-on-click-modal="false"
+                height="200"
+                v-model="seeMyMsg"
+                title="对话框标题"
+                class-name="vertical-center-modal"
+                :width="800">
+            <modal-header slot="header" :content="seeDetailofMsg"></modal-header>
+            <show v-if="seeMyMsg" :stuid="stuid"></show>
+            <div slot="footer"></div>
+        </Modal>
+        <!--新增-->
+        <Modal
+                :mask-closable="false"
+                close-on-click-modal="false"
+                height="200"
+                v-model="addModal"
+                title="对话框标题"
+                class-name="vertical-center-modal"
+                :width="800">
+            <modal-header slot="header" :content="addId"></modal-header>
+            <add v-if="addModal" @add="subCallback" @cancel="cancel" :textbook-lsit="textbookLsit"></add>
+            <div slot="footer"></div>
+        </Modal>
+        <!--修改-->
+        <Modal
+                :mask-closable="false"
+                close-on-click-modal="false"
+                height="200"
+                v-model="editModal"
+                title="对话框标题"
+                class-name="vertical-center-modal"
+                :width="800">
+            <modal-header slot="header" :content="editId"></modal-header>
+            <edit v-if="editModal" @edit="subCallback" @cancel="cancel"
+                  :operaility-data="operailityData"></edit>
+            <div slot="footer"></div>
+        </Modal>
+        <!--导入弹窗-->
+        <Modal
+                :mask-closable="false"
+                close-on-click-modal="false"
+                height="200"
+                v-model="toChannelModal"
+                title="对话框标题"
+                class-name="vertical-center-modal"
+                :width="800">
+            <modal-header slot="header" :content="toChannelId"></modal-header>
+            <toChannel v-if="toChannelModal" @toChannel="subCallback" @cancel="cancel"
+                       :operaility-data="operailityData"></toChannel>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
+</template>
+<script>
+  import show from '../../common/users/studentDetail.vue'
+  import edit from './studentManage_edit.vue'
+  import add from './studentManage_add.vue'
+  import addVip from './addVip.vue'
+  import gradeOption from '../../common/gradeOption.vue'
+  import api from './api'
+  import toChannel from './student_toChannel.vue'
+  import { list as rules } from './rules'
+  import VDistpicker from 'v-distpicker' //地区选择器
+
+  let Util = null
+  export default {
+    data () {
+      return {
+        rules,
+        //* 表格 *//
+        self: this,
+        totalCount: 0,
+        seeMyMsg: false,
+        seeDetailofMsg: {
+          id: 'seeDetailofMsg',
+          title: '查看',
+        },
+        toChannelId: {
+          id: 'toChannelId',
+          title: '导入'
+        },
+
+        addId: {
+          id: 'addId',
+          title: '新增'
+        },
+        editId: {
+          id: 'editId',
+          title: '修改'
+        },
+        // loading: false,
+        dynamicHt: 100, // 表格高度
+        multipleSelection: [],
+        operailityData: {},
+        tableData: [],
+        searchMore: false,
+        formValidate: {
+          grade: '',//年级
+          province: '',
+          town: '',
+          county: '',//市区
+          account: '',//账号
+          textbookVersionId: '',//教材版本id
+          accountStatus: '',//账号状态
+          vipStatus: ''//VIP状态
+        },
+        textbookLsit: [],
+        toChannelModal: false,
+        stuid: '',
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      //初始化函数
+      init () {
+        Util = this.$util
+        this.ajax({
+          ajaxSuccess: this.success,
+          ajaxParams: {
+            url: '/textbook/version/all',
+            method: 'get'
+          }
+        })
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize}
+        }
+        this.setTableData()
+      },
+      success (res) {
+        this.textbookLsit = res.data
+      },
+      /************************** 表格 ************************/
+      /*
+      * checkbox 选择后触发事件
+      * @param val Array 存在所有的选择每一个行数据
+      */
+      handleSelectionChange (val) {
+        this.multipleSelection = val
+      },
+      getProvince (val) {
+        if (val.code != undefined) {
+          this.formValidate.province = val.value
+        } else {
+          this.formValidate.province = ''
+        }
+      },
+      getCity (val) {
+        if (val.code != undefined) {
+          this.formValidate.town = val.value
+        } else {
+          this.formValidate.town = ''
+        }
+      },
+      /*
+      * 设置表格数据
+      * @param isLoading Boolean 是否加载
+      */
+      setTableData (isLoading) {
+        Object.assign(this.queryQptions.params, this.formValidate)
+        this.ajax({
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: this.queryQptions
+        }, isLoading)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = this.addIndex(res.data.dataList || [])
+
+      },
+      add () {
+        let _that = this
+        this.openModel('add')
+//                Util.dialog({
+//                    title: '新增',
+//                    width: '1000px',
+//                    content: {id: 'addId', title: '新增'},
+//                    component: add,
+//                    data: {
+//                        textbookLsit: this.textbookLsit,
+//                        _that:_that
+//                    },
+//                    close: () => {//关闭后触发
+//                        this.subCallback()
+//                    },
+//                    confirm: (result) => {//显式$emit('confirm')时触发
+//                        console.log('dialog is confirmed, and dialog result is ', result)
+//                    }
+//                });
+      },
+      //查看
+      show (item) {
+        console.log(item)
+        this.stuid = item.id
+        this.seeMyMsg = true
+//                Util.dialog({
+//                    title: '查看',
+//                    width: '1000px',
+//                    content: {id: 'showId', title: '查看'},
+//                    component: show,
+//                    data: {
+//                        dialogData: item,
+//                    },
+//                    close: () => {//关闭后触发
+//                        // this.subCallback()
+//                    },
+//                    confirm: (result) => {//显式$emit('confirm')时触发
+//                        console.log('dialog is confirmed, and dialog result is ', result)
+//                    }
+//                })
+      },
+      //修改
+      edit (item) {
+        this.operailityData = item
+        this.openModel('edit')
+//                Util.dialog({
+//                    title: '修改',
+//                    width: '1000px',
+//                    content: {id: 'editId', title: '修改'},
+//                    component: edit,
+//                    data: {
+//                        dialogData: item,
+//                        textbookLsit: this.textbookLsit
+//                    },
+//                    close: () => {//关闭后触发
+//                        this.subCallback()
+//                    },
+//                    confirm: (result) => {//显式$emit('confirm')时触发
+//                        console.log('dialog is confirmed, and dialog result is ', result)
+//                    }
+//                })
+      },
+      //      导入
+      toChannel () {
+        this.openModel('toChannel')
+      },
+      //搜索查询
+      searchEvent () {
+        let isSubmit = this.handleSubmit('formValidate')
+        if (isSubmit) {
+          this.setTableData()
+        }
+      },
+      /*
+     * 列表查询方法
+     * @param string 查询from的id
+     * */
+      handleSubmit (name) {
+        let flag = false
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            flag = true
+          } else {
+            this.errorMess('表单验证失败!')
+          }
+        })
+        return flag
+      },
+      // 高级搜索按钮展开搜索表单并重新计算表格高度
+      showSearchMore () {
+        this.searchMore = !this.searchMore
+        this.$nextTick(function () {
+          this.setTableDynHeight()
+        })
+      },
+      addVip (item) {
+        Util.dialog({
+          title: '升为会员',
+          width: '1000px',
+          content: {id: 'addVipId', title: '升为会员'},
+          component: addVip,
+          data: {
+            id: item
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      //数据排序
+      sortChange (row) {
+        console.log(row)
+      },
+      enable1 (item) {//冻结   解冻
+        Util.todoConfirm({
+          title: '确定冻结该用户吗？',
+          content: {id: 'todoId', title: '冻结该用户'},
+          data: {
+            data: {ids: Util.getStrByArr([item], 'id'), accountStatus: '1'},
+            api: api.enable,
+            msg: '冻结'
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {
+          }
+        })
+      },
+      enable2 (item) {
+        Util.todoConfirm({
+          title: '确定恢复该用户吗？',
+          content: {id: 'todoId', title: '恢复该用户'},
+          data: {
+            data: {ids: Util.getStrByArr([item], 'id'), accountStatus: '0'},
+            api: api.enable,
+            msg: '恢复'
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {
+          }
+        })
+      },
+      //设置表格及分页的位置
+      setTableDynHeight () {
+        let content = this.$refs.content
+        let parHt = content.parentNode.offsetHeight
+        let myTable = this.$refs.myTable
+        let paginationHt = 90
+        this.dynamicHt = parHt - myTable.offsetTop - paginationHt
+        // this.$refs.myTable.style.height = this.dynamicHt + 'px';
+        // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+      },
+      /*
+       * 监听子组件通讯的方法
+       * 作用:根据不同的参数关闭对应的模态
+       * @param targer string example:"add"、"edit"
+       * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+       * 打开指定的模态窗体
+       * @param options string 当前指定的模态:"add"、"edit"
+       * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+      * @param targer string example:"add"、"edit"
+      * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+      * 例如:errorTitle、errorTitle
+      *addMessTitle:{
+      *    type:'add',
+      *    successTitle:'添加成功!',
+      *    errorTitle:'添加失败!',
+      *    ajaxSuccess:'ajaxSuccess',
+      *    ajaxError:'ajaxError',
+      *    ajaxParams:{
+      *      url:'/role/add',
+      *      method:'post'
+      *    }
+      *    }
+      * @param udata boolean 默认false  是否不需要刷新当前表格数据
+      * */
+      subCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.setTableData()
+        }
+      },
+      toChannelSubCallback (target, title) {
+
+      }
+    },
+    mounted () {
+      //页面dom稳定后调用
+      this.$nextTick(function () {
+        //初始表格高度及分页位置
+        this.setTableDynHeight()
+        //为窗体绑定改变大小事件
+        let Event = Util.events
+        Event.addHandler(window, 'resize', this.setTableDynHeight)
+      })
+    },
+    components: {
+      show, edit, add,
+      addVip,
+      toChannel,
+      VDistpicker,
+      gradeOption
+    }
+  }
+</script>
+
+<style lang="scss">
+    .cusccl_content {
+        .tip {
+            margin-left: 20px;
+            i {
+                background: #e0b9b6;
+                border-radius: 50%;
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                color: #000000;
+                text-align: center;
+                font-weight: 600;
+                margin-right: 5px;
+            }
+        }
+        .address {
+            select {
+                height: 30px;
+                padding: 0rem .75rem;
+            }
+        }
+    }
+</style>
+
+
+

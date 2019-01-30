@@ -1,0 +1,210 @@
+<template>
+    <div class="recharge">
+        <el-row style="padding-top:15px;">
+
+            <el-form ref="form" :inline="true" v-model="form" class="demo-form-inline">
+                <el-col>历史统计</el-col>
+                <el-form-item label="总收入金额：">
+                    <span v-if="PaymentData.totalAmount" style="font-size: 14px;font-weight: 500">{{PaymentData.totalAmount | money}}</span>
+                </el-form-item>
+                <br>
+                <el-form-item label="总订单数量：">
+                    <span v-if="PaymentData.orderNums" style="font-size: 14px;font-weight: 500">{{PaymentData.orderNums}}个订单</span>
+                </el-form-item>
+                <br>
+                <!--<el-row>-->
+                <!--<el-col>支出</el-col>-->
+                <!--<el-form-item label="提现">¥500</el-form-item>-->
+                <!--<el-form-item label="提现成功">¥2567</el-form-item>-->
+                <!--<el-form-item label="支出">¥7800</el-form-item>-->
+                <!--</el-row>-->
+                <el-form-item label="日期：">
+                    <el-date-picker v-model="form.date" type="daterange" :editable="false"
+                                    :picker-options="pickerOptions" @change="changeDate"
+                                    range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+                    </el-date-picker>
+                </el-form-item>
+            </el-form>
+            <el-col style="padding: 0 20px">
+                <ve-line :data="chartData" :settings="chartSettings" :loading="lineLoading"
+                         :tooltip="tooltip"></ve-line>
+                <ve-line :data="AmountchartData" :settings="AmountchartSettings" :loading="lineLoading"
+                         :tooltip="tooltip"></ve-line>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+<script>
+    let Util = null;
+    import api from './api';
+
+    export default {
+        data() {
+            return {
+                lineLoading: true,
+                PaymentData: {},
+                chartData: null,
+                chartSettings: null,
+                AmountchartData: null,
+                AmountchartSettings: null,
+                form: {
+                    date: []
+                },
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                }
+            }
+        },
+        created() {
+            this.tooltip = {
+                trigger: 'axis',
+                formatter: params => {
+                    let str = [];
+                    params.map(data => {
+                        let unit = '单'; // 单位
+                        if (data.seriesName == "成交金额") {
+                            unit = '元'
+                        }
+                        if (!str.length) {
+                            str.push(`<p>${data.axisValue}</p>`)
+                        }
+                        str.push(`<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:${data.color}"></span>${data.seriesName}：${data.value} ${unit}<br/>`)
+                    });
+                    return str.join('')
+                }
+            }
+            this.init()
+        },
+        methods: {
+            init() {
+                this.form.date = [new Date(this.getBeforeDate(7)), new Date()];
+                this.ajax({
+                    ajaxSuccess: res => {
+                        this.PaymentData = res.data
+                    },
+                    ajaxParams: {
+                        url: api.productPayment.path
+                    }
+                });
+                this.getPayment()
+            },
+            /**
+             * 获取消费记录
+             * **/
+            getPayment() {
+                this.lineLoading = true;
+                this.ajax({
+                    ajaxSuccess: this.chartSet,
+                    ajaxParams: {
+                        url: api.productPaymentLine.path,
+                        params: {
+                            startDate: this.conductDate(this.form.date[0], 'yyyy-MM-dd'),
+                            endDate: this.conductDate(this.form.date[1], 'yyyy-MM-dd')
+                        }
+                    }
+                })
+            },
+            changeDate(arr) {
+                arr && this.getPayment()
+            },
+            chartSet(res) {
+                let data = res.data;
+                let chartData = {
+                    columns: ['日期', '总下单数量', '成交总数', '未付款/取消数量'],
+                    rows: []
+                };
+                let AmountchartData = {
+                    culumns: ['成交金额'],
+                    rows: []
+                }
+                let rowItem = {};
+                let AmountrowItem = {};
+                data.sort((a, b) => a.dates > b.dates);
+                data.map(item => {
+                    rowItem = {
+                        '总下单数量': item.newOrderNums,
+                        '日期': this.conductDate(item.dates, 'MM月dd日'),
+                        '成交总数': item.paymentOrderNums,
+                        '未付款/取消数量': item.cancelOrderNums
+                    },
+                        AmountrowItem = {
+                            '日期': this.conductDate(item.dates, 'MM月dd日'),
+                            '成交金额': item.totalAmount / 100
+                        },
+                        AmountchartData.rows.push(AmountrowItem)
+                    chartData.rows.push(rowItem)
+                });
+                this.lineLoading = false;
+                this.chartData = chartData;
+                this.AmountchartData = AmountchartData;
+                this.chartSettings = {
+                    metrics: ['总下单数量', '成交总数', '未付款/取消数量'],
+                    dimension: ['日期']
+                }
+                this.AmountchartSettings = {
+                    metrics: ['成交金额'],
+                    dimension: ['日期']
+                }
+            },
+            getBeforeDate(n) {
+                let d = new Date();
+                let year = d.getFullYear();
+                let mon = d.getMonth() + 1;
+                let day = d.getDate();
+                let s;
+                if (day <= n) {
+                    if (mon > 1) {
+                        mon = mon - 1;
+                    } else {
+                        year = year - 1;
+                        mon = 12;
+                    }
+                }
+                d.setDate(d.getDate() - n);
+                year = d.getFullYear();
+                mon = d.getMonth() + 1;
+                day = d.getDate();
+                s = year + "-" + (mon < 10 ? ('0' + mon) : mon) + "-" + (day < 10 ? ('0' + day) : day);
+                return s;
+            }
+        }
+    }
+</script>
+<style lang="scss" scoped>
+    .recharge {
+        background: #ffffff;
+        border-radius: 5px;
+    }
+
+    .el-form {
+        margin-left: 35px;
+        .el-col {
+            font-size: 18px;
+            line-height: 30px;
+        }
+    }
+</style>

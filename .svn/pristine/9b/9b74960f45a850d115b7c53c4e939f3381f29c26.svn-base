@@ -1,0 +1,358 @@
+<template>
+    <div class="moudle-wrap modal clearfix qtt_main" id="content" ref="content">
+        <subject-head @change="changeHeader"></subject-head>
+        <el-row>
+            <el-col class="search-from">
+                <el-col :span="7">
+                    <span class="btn-lable">添加试卷：</span>
+                  <el-button size="small" class="greenButton" @click="addZn">智能组卷</el-button>
+                    <span>|</span>
+                  <el-button size="small" class="greenButton" @click="addRg">人工组卷</el-button>
+
+                </el-col>
+                <el-col :span="17" align="right">
+                    <el-form class="demo-ruleForm" :inline="true" :model="searchObj" :rules="rules" ref="searchObj">
+                        <el-form-item label="试卷名称：" prop="name">
+                            <el-input size="small" v-model="searchObj.name"
+                                      placeholder="输入试卷名称"></el-input>
+                        </el-form-item>
+                        <el-form-item label="试卷类型：" prop="papersTypes">
+                            <el-select v-model="searchObj.paperTypes" clearable placeholder="请选择">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option v-for="(item,index) in paperTypesArr" :key="index" :label="item.value"
+                                           :value="item.code"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <!--<el-form-item label="试卷名称：" prop="name">-->
+                        <!--<el-input size="small" v-model="searchObj.name"-->
+                        <!--placeholder="输入试卷名称"></el-input>-->
+                        <!--</el-form-item>-->
+                        <el-form-item label="试卷编号：" prop="no">
+                            <el-input size="small" v-model="searchObj.no"
+                                      placeholder="输入试卷编号"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button class="search-btn" size="small" type="primary" @click="searchEvent">搜索
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+            </el-col>
+        </el-row>
+
+        <div id="myTable" ref="myTable">
+            <el-table align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                      style="width: 100%" @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="30"></el-table-column>
+                <el-table-column label="试卷编号" prop="no" width="140"></el-table-column>
+                <el-table-column label="试卷名称" prop="name" show-overflow-tooltip></el-table-column>
+                <el-table-column label="试卷类型" align="center" prop="types" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.papersTypes | papersTypes }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="出卷时间" prop="createTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.createTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="修改时间" prop="updateTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.updateTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="240">
+                    <template slot-scope="scope">
+                      <el-button size="small" class="tableMakeItem" @click="show(scope.row)">查看</el-button>
+                      <el-button size="small" class="tableMakeItem" @click="edit(scope.row)">修改</el-button>
+                      <el-button size="small" class="tableMakeItem" @click="toRemove(scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div style="margin: 10px 50px 10px 0;">
+              <el-button size="small" class="deleteButton" @click="toRemove('')">批量删除</el-button>
+                <div style="float: right;">
+                    <el-pagination
+                            @size-change="changePageSize"
+                            @current-change="changePage"
+                            :current-page.sync="myPages.currentPage"
+                            :page-size="myPages.pageSize"
+                            layout="total,prev, pager, next, jumper"
+                            :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框 增加（add） -->
+        <Modal :mask-closable="false" v-model="addZnModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :width="1100">
+            <modal-header slot="header" :content="contentHeader.addZnId"></modal-header>
+            <add-zn v-if="addZnModal" @cancel="cancel" @preview="preview"></add-zn>
+            <div slot="footer"></div>
+        </Modal>
+        <!-- 模态框 增加（add） -->
+        <Modal :mask-closable="false" v-model="addRgModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :width="1200">
+            <modal-header slot="header" :content="contentHeader.addRgId"></modal-header>
+            <add-rg v-if="addRgModal" @cancel="cancel" @add="subCallback"></add-rg>
+            <div slot="footer"></div>
+        </Modal>
+        <!-- 模态框 编辑（edit） -->
+        <Modal :mask-closable="false" v-model="editModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :width="1100">
+            <modal-header slot="header" :content="contentHeader.editId"></modal-header>
+            <edit v-if="editModal" @cancel="cancel" @edit="subCallback" :operaility-data="operailityData"></edit>
+            <div slot="footer"></div>
+        </Modal>
+        <!-- 模态框 查看（view） -->
+        <Modal :mask-closable="false" v-model="showModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :loading="true"
+               :width="1100">
+            <modal-header slot="header" :parent="self" :content="contentHeader.showId"></modal-header>
+            <show v-if="showModal" @cancel="cancel" :operaility-data="operailityData"></show>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
+</template>
+<script>
+    import api from './api';
+    import {testPaperManagementSearch as rules} from '../rules'
+    import {paperTypes as paperTypesArr} from '../../../libs/paperTypes'
+    import subjectHead from '@/components/common/subjectHead.vue'
+    import show from './testPaperManagement_show'
+    import edit from './testPaperManagement_edit'
+    import addZn from './zn/add.vue'
+    import addRg from './rg/add.vue'
+
+    let Util = null;
+    export default {
+        data() {
+            return {
+                rules,
+                paperTypesArr,
+                //* 表格 *//
+                self: this,
+                totalCount: 0,
+                // loading: false,
+                dynamicHt: 0, // 表格高度
+                multipleSelection: [],
+                operailityData: {},
+                tableData: [],
+                addZnModal: false,
+                addRgModal: false,
+                contentHeader: {
+                    addZnId: {id: "addZnId", title: "智能组卷"},
+                    addRgId: {id: "addRgId", title: "人工组卷"},
+                    showId: {id: "showId", title: "查看试卷"},
+                    editId: {id: "editId", title: "编辑试卷"}
+                },
+                searchObj: {
+                    name: '',//名称
+                    no: '',//编号
+                    paperTypes: '', //试卷类型
+                    textbookVersionId: '',
+                    subject: "",
+                    grade: "",
+                    term: ""
+                }
+            }
+        },
+        created() {
+            this.init();
+        },
+        methods: {
+            //初始化函数
+            init() {
+                Util = this.$util;
+                this.myPages = Util.pageInitPrams;
+                this.queryQptions = {
+                    url: api.list.path,
+                    params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize}
+                }
+                this.setTableData();
+                this.initStoreData();
+            },
+            //筛选
+            changeHeader(obj, select) {
+                for (let key in this.searchObj) {
+                    this.searchObj[key] = select[key] === 0 ? '0' : (select[key] && select[key] || '');
+                }
+                this.searchObj.textbookVersionId = select.textbookVersion;
+                this.searchObj.subject = obj.subject && obj.subject.code;
+                this.setTableData()
+            },
+            // 初始化状态数据
+            initStoreData() {
+                this.$store.commit('papers/init');
+                let opt = {
+                    ajaxSuccess: res => {
+                        let obj = {};
+                        if (res.data && res.data instanceof Array) {
+                            res.data.map(item => obj[item.id] = item)
+                        }
+                        this.$store.commit('papers/update', {key: 'questionsType', value: obj})
+                    },
+                    ajaxParams: {
+                        url: api.questionsType.path,
+                        params: {types: 0}
+                    }
+                };
+                this.ajax(opt)
+            },
+            /************************** 表格 ************************/
+            /*
+            * checkbox 选择后触发事件
+            * @param val Array 存在所有的选择每一个行数据
+            */
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            /*
+             * 设置表格数据
+             * @param isLoading Boolean 是否加载
+             */
+            setTableData(isLoading) {
+                Object.assign(this.queryQptions.params, this.searchObj);
+                this.ajax({
+                    ajaxSuccess: 'listDataSuccess',
+                    ajaxParams: this.queryQptions
+                }, isLoading)
+            },
+            // 数据请求成功回调
+            listDataSuccess(res, m, loading) {
+                this.totalCount = res.data.totalCount || 0;
+                this.tableData = this.addIndex(res.data.dataList || []);
+            },
+            //搜索查询
+            searchEvent() {
+                let isSubmit = this.handleSubmit('searchObj');
+                if (isSubmit) {
+                    this.setTableData()
+                }
+            },
+            /*
+           * 列表查询方法
+           * @param string 查询from的id
+           * */
+            handleSubmit(name) {
+                let flag = false
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                })
+                return flag
+            },
+            // 人工组卷
+            addRg() {
+                this.openModel('addRg')
+            },
+            //智能组卷
+            addZn() {
+                this.openModel('addZn')
+            },
+            // 智能组卷预览
+            preview() {
+                this.cancel('addZn');
+                this.edit(null);
+            },
+            //查看
+            show(item) {
+                this.operailityData = item;
+                this.openModel('show')
+            },
+            //修改
+            edit(item) {
+                this.operailityData = item;
+                this.openModel('edit')
+            },
+            //批量删除
+            toRemove(item) {
+                if (!(item || this.isSelected())) {
+                    return false
+                }
+                Util.todoConfirm({
+                    title: '确定删除该试卷吗？',
+                    content: {id: 'todoId', title: '删除该试卷'},
+                    data: {
+                        data: {ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id')},
+                        api: api.remove,
+                        msg: '删除'
+                    },
+                    close: () => {//关闭后触发
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    }
+                })
+            },
+            //设置表格及分页的位置
+            setTableDynHeight() {
+                let content = this.$refs.content.parentNode.offsetHeight;
+                let myTable = this.$refs.myTable.offsetTop;
+                let paginationHt = 50;
+                this.dynamicHt = content - myTable - paginationHt;
+            },
+            // 增加回调
+            subCallback(target, title, updata) {
+                this.cancel(target);
+                if (title) {
+                    this.successMess(title);
+                }
+                if (!updata) {
+                    this.setTableData();
+                }
+            },
+            /*
+            * 打开指定的模态窗体
+            * @param options string 当前指定的模态:"add"、"edit"
+            * */
+            openModel(options) {
+                this[options + 'Modal'] = true;
+            },
+            // 取消
+            cancel(targer) {
+                this[targer + 'Modal'] = false;
+            },
+            /*
+            * 列表数据只能选择一个
+            * @param isOnly true  是否只选择一个
+            */
+            isSelected(isOnly) {
+                let len = this.multipleSelection.length;
+                let flag = true;
+                if (len == 0) {
+                    this.showMess("请选择数据!");
+                    flag = false;
+                }
+                return flag;
+            }
+        },
+        mounted() {
+            //页面dom稳定后调用
+            this.$nextTick(function () {
+                //初始表格高度及分页位置
+                this.setTableDynHeight();
+                //为窗体绑定改变大小事件
+                let Event = Util.events;
+                Event.addHandler(window, "resize", this.setTableDynHeight);
+            })
+        },
+        components: {
+            subjectHead,
+            show, edit, addZn, addRg
+        }
+    }
+</script>
+<style lang="scss">
+    .qtt_main {
+        .btn-lable {
+            font-size: 16px;
+        }
+    }
+
+</style>
+
+
+

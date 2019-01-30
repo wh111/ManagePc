@@ -1,0 +1,1487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://D:/teacherPc1/src/page/selfData/selfData.vue" description="//        let opt = {&#10;//          ajaxSuccess: res..." line="614" />
+  </component>
+  <component name="ChangeListManager">
+    <list id="1d15691c-7d72-4973-96ba-16bcd208a363" name="不提交" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/666.mp3" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/index.js" afterPath="$PROJECT_DIR$/config/index.js" />
+    </list>
+    <list default="true" readonly="true" id="797c162f-e359-4b66-aa59-642622e21125" name="Default" comment="管理端：首页更改，教师资格证7位，上传音频视频修改">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.babelrc" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sasadmin/ueditor1_4_3_3/ueditor.all.js" afterPath="$PROJECT_DIR$/sasadmin/ueditor1_4_3_3/ueditor.all.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/common/questionEdit/radio.vue" afterPath="$PROJECT_DIR$/src/components/common/questionEdit/radio.vue" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/index.vue" afterPath="$PROJECT_DIR$/src/components/index.vue" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questions_toChannel.vue" afterPath="$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questions_toChannel.vue" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/components/systemManage/teamManage/team_list.vue" afterPath="$PROJECT_DIR$/src/components/systemManage/teamManage/team_list.vue" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/ueditor1_4_3_3/dialogs/image/image.js" afterPath="$PROJECT_DIR$/static/ueditor1_4_3_3/dialogs/image/image.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/ueditor1_4_3_3/dialogs/video/video.js" afterPath="$PROJECT_DIR$/static/ueditor1_4_3_3/dialogs/video/video.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/ueditor1_4_3_3/jsp/config.json" afterPath="$PROJECT_DIR$/static/ueditor1_4_3_3/jsp/config.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/ueditor1_4_3_3/ueditor.all.js" afterPath="$PROJECT_DIR$/static/ueditor1_4_3_3/ueditor.all.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/ueditor1_4_3_3/ueditor.config.js" afterPath="$PROJECT_DIR$/static/ueditor1_4_3_3/ueditor.config.js" />
+    </list>
+    <ignored path="$PROJECT_DIR$/.tmp/" />
+    <ignored path="$PROJECT_DIR$/temp/" />
+    <ignored path="$PROJECT_DIR$/tmp/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <file path="$PROJECT_DIR$/config/index.js" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="questionsManagement_list.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_list.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="579">
+              <caret line="150" column="16" lean-forward="false" selection-start-line="150" selection-start-column="16" selection-end-line="150" selection-end-column="16" />
+              <folding>
+                <element signature="e#9732#9786#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="questions_toChannel.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questions_toChannel.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="157">
+              <caret line="31" column="51" lean-forward="true" selection-start-line="31" selection-start-column="51" selection-end-line="31" selection-end-column="51" />
+              <folding>
+                <element signature="n#style#0;n#el-button#0;n#el-upload#0;n#el-col#1;n#el-row#1;n#div#0;n#template#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#el-button#0;n#el-upload#0;n#el-col#2;n#el-row#1;n#div#0;n#template#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/element-ui/packages/upload/src/index.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="114">
+              <caret line="10" column="2" lean-forward="false" selection-start-line="10" selection-start-column="2" selection-end-line="10" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="questionsManagement_show.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_show.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="228">
+              <caret line="36" column="25" lean-forward="false" selection-start-line="36" selection-start-column="25" selection-end-line="36" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="systemManagement.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/router/systemManagement.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="28" column="78" lean-forward="false" selection-start-line="28" selection-start-column="78" selection-end-line="28" selection-end-column="78" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="team_list.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/systemManage/teamManage/team_list.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="266">
+              <caret line="14" column="35" lean-forward="false" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/config/index.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="276">
+              <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="show.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/common/questionShow/show.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="579">
+              <caret line="66" column="25" lean-forward="false" selection-start-line="66" selection-start-column="17" selection-end-line="66" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="radio.vue" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/components/common/questionEdit/radio.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="328">
+              <caret line="25" column="63" lean-forward="false" selection-start-line="25" selection-start-column="63" selection-end-line="25" selection-end-column="63" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="trainningCenter.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/router/trainningCenter.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="19" column="36" lean-forward="false" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="vue" />
+        <option value="api" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>changeSubject</find>
+      <find>answerAnalysis</find>
+      <find>handleClose</find>
+      <find>listenSubEvent</find>
+      <find>formValidate</find>
+      <find>addMessTitle</find>
+      <find>expenseFileEventTitleExt</find>
+      <find>changeEdit</find>
+      <find>storeUE</find>
+      <find>图文</find>
+      <find>successHandler</find>
+      <find>imager</find>
+      <find>stat</find>
+      <find>state.envs</find>
+      <find>initEnvs</find>
+      <find>envs</find>
+      <find>location.host</find>
+      <find>static</find>
+      <find>unhtmlData</find>
+      <find>:style</find>
+      <find>getUeditorVal</find>
+      <find>showData</find>
+      <find>teamManagement</find>
+      <find>questionManagement</find>
+      <find>trainningCenter/questionManagement</find>
+      <find>url</find>
+      <find>roomSpecialtyList</find>
+      <find>handlePreview</find>
+      <find>beforeAvatarUpload</find>
+      <find>doc</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>term</replace>
+      <replace>grade</replace>
+      <replace>stage</replace>
+      <replace>window.resourceHttp</replace>
+    </replaceStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/components/integralManage/integral_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/taskPublish/taskApply_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/taskPublish/taskPublish.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/taskPublish/taskPublish_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/Congregation/Congregation_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/topicCollection/topicCollection_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/teachersSoleProblems/teachersSoleProblems_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/mechanismManage/mechanism_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/powerManage/power_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/questionsTypeManage/questionsType_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/knowledgeSystemManage/knowledgeSystem_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/archivesManage/archives_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/message/message_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/withdrawalsManage/withdrawals_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/feedbackManage/feedback_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/common/header.vue" />
+        <option value="$PROJECT_DIR$/src/components/userManage/studentManage/addVip.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/taskPublish/zn/add.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/topicCollection/topicCollection_show.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/archivesManage/archives_show.vue" />
+        <option value="$PROJECT_DIR$/src/components/questionsCenter/testPaperManagement/testPaperManagement_edit.vue" />
+        <option value="$PROJECT_DIR$/src/router/index.js" />
+        <option value="$PROJECT_DIR$/src/components/login.vue" />
+        <option value="$PROJECT_DIR$/src/components/goodsManagement/integralManage/rules.js" />
+        <option value="$PROJECT_DIR$/src/components/userManage/teacherManage/teacherManage_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/userManage/teacherManage/teacherManage_edit.vue" />
+        <option value="$PROJECT_DIR$/src/components/userManage/teacherManage/teacherManage_add.vue" />
+        <option value="$PROJECT_DIR$/src/components/index.vue" />
+        <option value="$PROJECT_DIR$/src/assets/style/common.less" />
+        <option value="$PROJECT_DIR$/src/components/userManage/studentManage/studentManage_list.vue" />
+        <option value="$PROJECT_DIR$/node_modules/element-ui/packages/pagination/src/pagination.js" />
+        <option value="$PROJECT_DIR$/src/libs/util.js" />
+        <option value="$PROJECT_DIR$/src/components/messageManage/pending/pending_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/taskPublish/taskPublish_add.vue" />
+        <option value="$PROJECT_DIR$/src/components/questionsCenter/errorFeedback/feedback.vue" />
+        <option value="$PROJECT_DIR$/src/components/goodsManagement/test_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/materialManage/material_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/reportFormCenter/recharge_form.vue" />
+        <option value="$PROJECT_DIR$/src/components/reportFormCenter/testType_form.vue" />
+        <option value="$PROJECT_DIR$/src/components/reportFormCenter/sale_form.vue" />
+        <option value="$PROJECT_DIR$/src/components/userManage/teacherManage/teacher_toChannel.vue" />
+        <option value="$PROJECT_DIR$/src/components/common/questionShow/show.vue" />
+        <option value="$PROJECT_DIR$/src/components/common/questionShow/judgment_show.vue" />
+        <option value="$PROJECT_DIR$/src/components/taskManage/teachersSoleProblems/getTeacherReply.vue" />
+        <option value="$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_list.vue" />
+        <option value="$PROJECT_DIR$/src/components/common/questionEdit/radio.vue" />
+        <option value="$PROJECT_DIR$/src/store/app.js" />
+        <option value="$PROJECT_DIR$/sasadmin/ueditor1_4_3_3/ueditor.all.js" />
+        <option value="$PROJECT_DIR$/src/components/systemManage/teamManage/team_list.vue" />
+        <option value="$PROJECT_DIR$/config/index.js" />
+        <option value="$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questions_toChannel.vue" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER">
+    <package-json value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodeModulesDirectoryManager">
+    <handled-path value="$PROJECT_DIR$/node_modules" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="7" />
+    <option name="width" value="1918" />
+    <option name="height" value="1040" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource ProjectPane="true" />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="config" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="dist" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="node_modules" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="node_modules" type="462c0819:PsiDirectoryNode" />
+              <item name="element-ui" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="node_modules" type="462c0819:PsiDirectoryNode" />
+              <item name="element-ui" type="462c0819:PsiDirectoryNode" />
+              <item name="packages" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="node_modules" type="462c0819:PsiDirectoryNode" />
+              <item name="element-ui" type="462c0819:PsiDirectoryNode" />
+              <item name="packages" type="462c0819:PsiDirectoryNode" />
+              <item name="upload" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="node_modules" type="462c0819:PsiDirectoryNode" />
+              <item name="element-ui" type="462c0819:PsiDirectoryNode" />
+              <item name="packages" type="462c0819:PsiDirectoryNode" />
+              <item name="upload" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+              <item name="questionEdit" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+              <item name="questionShow" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="questionsCenter" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="questionsCenter" type="462c0819:PsiDirectoryNode" />
+              <item name="questionsManagement" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="systemManage" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="systemManage" type="462c0819:PsiDirectoryNode" />
+              <item name="teamManage" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="router" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pcduan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pcduan" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="D:/gulouNew" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
+    <property name="SearchEverywhereHistoryKey" value="integralList&#9;FILE&#9;file://F:/pro/sas_adminPc/src/components/goodsManagement/integralManage/integral_list.vue" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/static/ueditor1_4_3_3/ueditor.all.js" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="346" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1" value="346" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2" value="346" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3" value="346" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4" value="345" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4" value="4" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth0" value="242" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth1" value="237" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth2" value="289" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth3" value="244" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4" value="717" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder4" value="4" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth5" value="72" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder5" value="5" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth5" value="577" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder5" value="5" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\pcduan\src\assets\images" />
+      <recent name="D:\pcduan\sasadmin\img" />
+      <recent name="D:\pcduan" />
+      <recent name="D:\pcduan\static" />
+      <recent name="F:\pro\sas_adminPc\src\vuex" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\adminpc\src\components\taskManage\teachersSoleProblems" />
+      <recent name="F:\pro\sas_adminPc\src\assets" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="build" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="C:/node" />
+      <envs />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="C:/node" />
+      <envs />
+    </configuration>
+    <configuration name="start" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="C:/node" />
+      <envs />
+    </configuration>
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="npm.dev" />
+      <item index="1" class="java.lang.String" itemvalue="npm.build" />
+      <item index="2" class="java.lang.String" itemvalue="npm.start" />
+    </list>
+    <recent_temporary>
+      <list size="3">
+        <item index="0" class="java.lang.String" itemvalue="npm.build" />
+        <item index="1" class="java.lang.String" itemvalue="npm.dev" />
+        <item index="2" class="java.lang.String" itemvalue="npm.start" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration" myAutoUpdateAfterCommit="true" cleanupOnStartRun="true">
+    <configuration>C:\Users\Administrator\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+    <option name="UPDATE_DEPTH" value="infinity" />
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\pcduan" />
+          <option name="myCopyRoot" value="D:\pcduan" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\pcduan" />
+          <option name="myCopyRoot" value="D:\pcduan" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="797c162f-e359-4b66-aa59-642622e21125" name="Default" comment="" />
+      <changelist id="1d15691c-7d72-4973-96ba-16bcd208a363" name="不提交" comment="" />
+      <created>1511332448175</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1511332448175</updated>
+      <workItem from="1511332449525" duration="28755000" />
+      <workItem from="1515061896443" duration="16681000" />
+      <workItem from="1515135444382" duration="164000" />
+      <workItem from="1515375818338" duration="4118000" />
+      <workItem from="1515382927264" duration="7864000" />
+      <workItem from="1515409250975" duration="4593000" />
+      <workItem from="1515478149471" duration="15969000" />
+      <workItem from="1515567424036" duration="1971000" />
+      <workItem from="1515575826849" duration="5971000" />
+      <workItem from="1515654981347" duration="6296000" />
+      <workItem from="1515661809265" duration="2746000" />
+      <workItem from="1522632586820" duration="20267000" />
+      <workItem from="1523149201516" duration="81496000" />
+      <workItem from="1523934946404" duration="14664000" />
+      <workItem from="1524101218445" duration="5663000" />
+      <workItem from="1524446051774" duration="36701000" />
+      <workItem from="1524648725274" duration="25900000" />
+      <workItem from="1525223363187" duration="47448000" />
+      <workItem from="1529916064930" duration="269000" />
+      <workItem from="1529916714366" duration="602000" />
+      <workItem from="1529918606052" duration="681000" />
+      <workItem from="1529920522290" duration="730000" />
+      <workItem from="1529922520118" duration="9852000" />
+      <workItem from="1530251328735" duration="55919000" />
+      <workItem from="1530753608235" duration="9903000" />
+      <workItem from="1531098011040" duration="68272000" />
+      <workItem from="1532308796099" duration="28889000" />
+      <workItem from="1532480865353" duration="25665000" />
+      <workItem from="1532599681397" duration="10270000" />
+      <workItem from="1532914707202" duration="10243000" />
+      <workItem from="1533018551234" duration="2643000" />
+      <workItem from="1533029268276" duration="14553000" />
+      <workItem from="1533517480807" duration="6177000" />
+      <workItem from="1533714103868" duration="733000" />
+      <workItem from="1533715407128" duration="9228000" />
+      <workItem from="1534122716871" duration="11645000" />
+      <workItem from="1535953984736" duration="1564000" />
+      <workItem from="1537431743876" duration="1353000" />
+      <workItem from="1537493210725" duration="1137000" />
+      <workItem from="1538965659332" duration="29734000" />
+      <workItem from="1539566554929" duration="1836000" />
+      <workItem from="1539568540570" duration="3904000" />
+      <workItem from="1539756096684" duration="1309000" />
+      <workItem from="1539824656566" duration="4168000" />
+      <workItem from="1540170885384" duration="7145000" />
+      <workItem from="1544154614676" duration="369000" />
+      <workItem from="1544155079091" duration="6456000" />
+      <workItem from="1545009563518" duration="27237000" />
+      <workItem from="1545613813550" duration="4984000" />
+      <workItem from="1545639845870" duration="708000" />
+      <workItem from="1545641813740" duration="2433000" />
+      <workItem from="1545701310169" duration="1819000" />
+      <workItem from="1546824366810" duration="15431000" />
+      <workItem from="1547458265609" duration="2237000" />
+      <workItem from="1548128439136" duration="9421000" />
+    </task>
+    <task id="LOCAL-00032" summary="系统管理-系统消息：发布给管理员的消息咋看？#6457">
+      <created>1524533870302</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1524533870302</updated>
+    </task>
+    <task id="LOCAL-00033" summary="任务管理---刷题大赛---列表和新增任务,查看:在管理端发布的任务,发布者都为系统,不能为管理员名称或者平台#6445">
+      <created>1524536624352</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1524536624352</updated>
+    </task>
+    <task id="LOCAL-00034" summary="系统管理-权限管理：新增角色/修改角色时填写角色描述（字数一多，点击保存就会报系统异常）#6440">
+      <created>1524537837687</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1524537837687</updated>
+    </task>
+    <task id="LOCAL-00035" summary="任务管理-众包组题：前往下一页的输入框显示过大，并且0条数据时不应该显示前往下一页#7534">
+      <created>1524550877649</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1524550877649</updated>
+    </task>
+    <task id="LOCAL-00036" summary="任务管理-众包组提：查看试题详情时，信息显示不全#7535">
+      <created>1524560394731</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1524560394731</updated>
+    </task>
+    <task id="LOCAL-00037" summary="商品管理-积分商品：不显示现价积分（1积分的商品，学生在题库中显示0积分）#7462">
+      <created>1524561185295</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1524561185295</updated>
+    </task>
+    <task id="LOCAL-00038" summary="商品管理-积分商品：不显示现价积分（1积分的商品，学生在题库中显示0积分）#7462">
+      <created>1524564946955</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1524564946956</updated>
+    </task>
+    <task id="LOCAL-00039" summary="任务管理-题集投稿：样式">
+      <created>1524618624418</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1524618624418</updated>
+    </task>
+    <task id="LOCAL-00040" summary="商品管理-积分商品-查看评价:查看评价中,去掉通过按钮,去掉状态列">
+      <created>1524634491843</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1524634491843</updated>
+    </task>
+    <task id="LOCAL-00041" summary="题库中心-试题管理：上传音频无法听，视频只能看MP4-avc的#6483">
+      <created>1524636156580</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1524636156580</updated>
+    </task>
+    <task id="LOCAL-00042" summary="题库中心-试题管理：上传音频无法听，视频只能看MP4-avc的#6483">
+      <created>1524637036754</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1524637036754</updated>
+    </task>
+    <task id="LOCAL-00043" summary="系统管理-题型管理：使用过的题型还可以对题型进行修改#6454">
+      <created>1524637302587</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1524637302587</updated>
+    </task>
+    <task id="LOCAL-00044" summary="任务中心-众包组题：试题收录之后，不进入共有题库#7544">
+      <created>1524707841321</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1524707841321</updated>
+    </task>
+    <task id="LOCAL-00045" summary="任务管理-众包组题：创建的任务，不显示知识点#7569">
+      <created>1524710344377</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1524710344377</updated>
+    </task>
+    <task id="LOCAL-00046" summary="管理端-用户中心-教师管理：修改老师信息，点击提交（结果没反应）#7558">
+      <created>1524731143613</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1524731143613</updated>
+    </task>
+    <task id="LOCAL-00047" summary="任务管理-刷题大赛：新增刷题大赛（开始时间不能自己选择）#7422">
+      <created>1524734198730</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1524734198730</updated>
+    </task>
+    <task id="LOCAL-00048" summary="管理端---任务管理---名师解题：搜索框筛选列表数据显示的问题#7589">
+      <created>1524792682046</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1524792682046</updated>
+    </task>
+    <task id="LOCAL-00049" summary="管理端-题库中心：文本框样式">
+      <created>1524818333768</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1524818333768</updated>
+    </task>
+    <task id="LOCAL-00050" summary="管理端---题库中心---错题反馈，超纲反馈：查看中不应显示您的答案对不对的显示#7597">
+      <created>1524886944264</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1524886944264</updated>
+    </task>
+    <task id="LOCAL-00051" summary="系统管理-权限管理：修改角色，出现系统异常（描述没有给出字数限制提示#7593">
+      <created>1524908773181</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1524908773182</updated>
+    </task>
+    <task id="LOCAL-00052" summary="任务管理-名师解题：点击查看，解题详情显示为空#7563">
+      <created>1524911964946</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1524911964951</updated>
+    </task>
+    <task id="LOCAL-00053" summary="管理端---任务管理---名师解题：搜索框筛选列表数据显示的问题  解决#7589">
+      <created>1525242064954</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1525242064954</updated>
+    </task>
+    <task id="LOCAL-00054" summary="管理端-商品审批：申请人显示的是当前登录人#7508">
+      <created>1525320090084</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1525320090084</updated>
+    </task>
+    <task id="LOCAL-00055" summary="学生端-我的作业-我的测评：在试卷详情中，同一个试题，学生端的试题编号与管理端的不一致#7513">
+      <created>1525329721729</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1525329721729</updated>
+    </task>
+    <task id="LOCAL-00056" summary="系统管理-题型管理：使用过的题型还可以对题型进行修改#6454">
+      <created>1525337666899</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1525337666899</updated>
+    </task>
+    <task id="LOCAL-00057" summary="任务管理-名师解题：点击查看，解题详情显示为空#7563">
+      <created>1525402304989</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1525402304989</updated>
+    </task>
+    <task id="LOCAL-00058" summary="任务管理-刷题大赛：新增刷题大赛（开始时间不能自己选择）#7422">
+      <created>1525745304912</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1525745304917</updated>
+    </task>
+    <task id="LOCAL-00059" summary="题库中心-试题管理：导入题目">
+      <created>1525861676433</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1525861676433</updated>
+    </task>
+    <task id="LOCAL-00060" summary="管理端：样式变更">
+      <created>1531374214592</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1531374214593</updated>
+    </task>
+    <task id="LOCAL-00061" summary="管理端：ueditor路径修改">
+      <created>1531725624751</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1531725624751</updated>
+    </task>
+    <task id="LOCAL-00062" summary="管理端：首页更改，教师资格证7位，上传音频视频修改">
+      <created>1531907792362</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1531907792362</updated>
+    </task>
+    <task id="LOCAL-00063" summary="管理端：列表展示">
+      <created>1532081470771</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1532081470771</updated>
+    </task>
+    <task id="LOCAL-00064" summary="管理端：样式更改">
+      <created>1532339089635</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1532339089636</updated>
+    </task>
+    <task id="LOCAL-00065" summary="管理端：bug修改">
+      <created>1532512273192</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1532512273193</updated>
+    </task>
+    <task id="LOCAL-00066" summary="管理端：增加图片修改">
+      <created>1532592052491</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1532592052492</updated>
+    </task>
+    <task id="LOCAL-00067" summary="管理端：样式更改">
+      <created>1533194993557</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1533194993557</updated>
+    </task>
+    <task id="LOCAL-00068" summary="管理端：商品管理-商品列表：新增商品不能为0">
+      <created>1533631850099</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1533631850100</updated>
+    </task>
+    <task id="LOCAL-00069" summary="管理端：教师资料修改">
+      <created>1534153370066</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1534153370066</updated>
+    </task>
+    <task id="LOCAL-00070" summary="管理端：menu菜单修改">
+      <created>1534153397480</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1534153397480</updated>
+    </task>
+    <task id="LOCAL-00071" summary="管理端：左侧栏更改">
+      <created>1537431891057</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1537431891057</updated>
+    </task>
+    <task id="LOCAL-00072" summary="【管理端】消息：消息弹窗中的分页控制的不是该弹窗页面的数据#10090">
+      <created>1538971034729</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1538971034730</updated>
+    </task>
+    <task id="LOCAL-00073" summary="【管理端】商品管理-商品列表：新增商品添加试卷时，考试时间被添加按钮覆盖#10098">
+      <created>1538977637325</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1538977637326</updated>
+    </task>
+    <task id="LOCAL-00074" summary="【管理端】消息：消息弹窗中的分页控制的不是该弹窗页面的数据#10090">
+      <created>1539054906068</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1539054906068</updated>
+    </task>
+    <task id="LOCAL-00075" summary="【管理端】错题反馈增加积分查看">
+      <created>1539328654629</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1539328654631</updated>
+    </task>
+    <task id="LOCAL-00076" summary="管理端：刷题大赛时间">
+      <created>1539328708122</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1539328708122</updated>
+    </task>
+    <task id="LOCAL-00077" summary="管理端：去掉多余的22222222222">
+      <created>1539567349640</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1539567349643</updated>
+    </task>
+    <task id="LOCAL-00078" summary="管理端：教材能否删除">
+      <created>1539830361658</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1539830361659</updated>
+    </task>
+    <task id="LOCAL-00079" summary="管理端：部分bug修改">
+      <created>1545647394804</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1545647394804</updated>
+    </task>
+    <task id="LOCAL-00080" summary="管理端：部分bug修改">
+      <created>1546840057735</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1546840057735</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="716786000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18598525" sideWeight="0.79910046" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26041666" sideWeight="0.4978746" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27578717" sideWeight="0.36880928" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40044248" sideWeight="0.4936238" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27578717" sideWeight="0.6311907" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18598525" sideWeight="0.20089956" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31270358" sideWeight="0.5700738" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24815983" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294271" sideWeight="0.4367694" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="92" y="92" width="1736" height="866" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32899022" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.071428575" sideWeight="0.53154576" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="92" y="92" width="1736" height="866" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.071428575" sideWeight="0.46845427" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16876972" sideWeight="0.17908654" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24321389" sideWeight="0.40674394" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23133236" sideWeight="0.4789695" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16876972" sideWeight="0.82091343" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973656" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <MESSAGE value="管理端---任务管理---名师解题：搜索框筛选列表数据显示的问题  解决#7589" />
+    <MESSAGE value="管理端-商品审批：申请人显示的是当前登录人#7508" />
+    <MESSAGE value="学生端-我的作业-我的测评：在试卷详情中，同一个试题，学生端的试题编号与管理端的不一致#7513" />
+    <MESSAGE value="系统管理-题型管理：使用过的题型还可以对题型进行修改#6454" />
+    <MESSAGE value="任务管理-名师解题：点击查看，解题详情显示为空#7563" />
+    <MESSAGE value="任务管理-刷题大赛：新增刷题大赛（开始时间不能自己选择）#7422" />
+    <MESSAGE value="题库中心-试题管理：导入题目" />
+    <MESSAGE value="管理端：样式变更" />
+    <MESSAGE value="管理端：ueditor路径修改" />
+    <MESSAGE value="管理端：首页更改，教师资格证7位，上传音频视频修改" />
+    <MESSAGE value="管理端：列表展示" />
+    <MESSAGE value="管理端：bug修改" />
+    <MESSAGE value="管理端：增加图片修改" />
+    <MESSAGE value="管理端：样式更改" />
+    <MESSAGE value="管理端：商品管理-商品列表：新增商品不能为0" />
+    <MESSAGE value="管理端：教师资料修改" />
+    <MESSAGE value="管理端：menu菜单修改" />
+    <MESSAGE value="管理端：左侧栏更改" />
+    <MESSAGE value="【管理端】商品管理-商品列表：新增商品添加试卷时，考试时间被添加按钮覆盖#10098" />
+    <MESSAGE value="【管理端】消息：消息弹窗中的分页控制的不是该弹窗页面的数据#10090" />
+    <MESSAGE value="【管理端】错题反馈增加积分查看" />
+    <MESSAGE value="管理端：刷题大赛时间" />
+    <MESSAGE value="管理端：去掉多余的22222222222" />
+    <MESSAGE value="管理端：教材能否删除" />
+    <MESSAGE value="管理端：部分bug修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="管理端：部分bug修改" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/libs/util.js</url>
+          <line>78</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="3" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/components/systemManage/knowledgeSystemManage/showKnowledge_show.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="38" column="38" lean-forward="false" selection-start-line="38" selection-start-column="38" selection-end-line="38" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/systemManage/knowledgeSystemManage/api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="7" column="29" lean-forward="false" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/testPaperManagement/testPaperManagement_edit.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6707">
+          <caret line="357" column="68" lean-forward="false" selection-start-line="357" selection-start-column="68" selection-end-line="357" selection-end-column="89" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/taskManage/taskPublish/taskPublish.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="10" column="23" lean-forward="false" selection-start-line="10" selection-start-column="23" selection-end-line="10" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/taskManage/taskPublish/taskPublish_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2033">
+          <caret line="109" column="4" lean-forward="false" selection-start-line="109" selection-start-column="4" selection-end-line="109" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/taskManage/taskPublish/taskPublish_add.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6004">
+          <caret line="318" column="40" lean-forward="false" selection-start-line="318" selection-start-column="40" selection-end-line="318" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/errorFeedback/errorFeedback_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1881">
+          <caret line="99" column="69" lean-forward="false" selection-start-line="99" selection-start-column="50" selection-end-line="99" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/errorFeedback/feedback.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1843">
+          <caret line="100" column="16" lean-forward="false" selection-start-line="100" selection-start-column="8" selection-end-line="100" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/goodsManagement/test_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="684">
+          <caret line="36" column="6" lean-forward="false" selection-start-line="36" selection-start-column="6" selection-end-line="36" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/userManage/studentManage/student_toChannel.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="21" column="34" lean-forward="false" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libs/util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19247">
+          <caret line="1023" column="0" lean-forward="false" selection-start-line="1023" selection-start-column="0" selection-end-line="1023" selection-end-column="0" />
+          <folding>
+            <marker date="1538970939651" expanded="true" signature="8669:9148" ph="..." />
+            <marker date="1538970939651" expanded="true" signature="10404:10887" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/reportFormCenter/api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="11" column="52" lean-forward="false" selection-start-line="11" selection-start-column="42" selection-end-line="11" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/reportFormCenter/active_form.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="53" column="83" lean-forward="false" selection-start-line="53" selection-start-column="83" selection-end-line="53" selection-end-column="83" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/reportFormCenter/assignment_form.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="22" column="30" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/router/reportCenter.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="388">
+          <caret line="68" column="74" lean-forward="false" selection-start-line="68" selection-start-column="74" selection-end-line="68" selection-end-column="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/reportFormCenter/testType_form.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-390">
+          <caret line="74" column="30" lean-forward="false" selection-start-line="74" selection-start-column="30" selection-end-line="74" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/userManage/teacherManage/teacher_toChannel.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="100" column="50" lean-forward="true" selection-start-line="100" selection-start-column="50" selection-end-line="100" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/reportFormCenter/sale_form.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="494">
+          <caret line="26" column="22" lean-forward="false" selection-start-line="26" selection-start-column="22" selection-end-line="26" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/systemManage/materialManage/material_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="13" column="35" lean-forward="false" selection-start-line="13" selection-start-column="35" selection-end-line="13" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/messageManage/pending/pending_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3192">
+          <caret line="169" column="11" lean-forward="false" selection-start-line="169" selection-start-column="11" selection-end-line="172" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/reportFormCenter/recharge_form.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="16" column="62" lean-forward="false" selection-start-line="16" selection-start-column="62" selection-end-line="16" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/questionShow/judgment_show.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="27" column="67" lean-forward="false" selection-start-line="27" selection-start-column="67" selection-end-line="27" selection-end-column="67" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/dataTemp.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_input.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="5" column="3" lean-forward="false" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/router/taskManagement.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1026">
+          <caret line="58" column="93" lean-forward="false" selection-start-line="58" selection-start-column="93" selection-end-line="58" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/taskManage/teachersSoleProblems/teachersSoleProblems_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2128">
+          <caret line="112" column="17" lean-forward="false" selection-start-line="112" selection-start-column="17" selection-end-line="112" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/taskManage/teachersSoleProblems/getTeacherReply.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="9" column="69" lean-forward="false" selection-start-line="9" selection-start-column="60" selection-end-line="9" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sasadmin/ueditor1_4_3_3/ueditor.parse.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="41" column="46" lean-forward="false" selection-start-line="41" selection-start-column="46" selection-end-line="41" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/subjectHead.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" column="59" lean-forward="false" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/questionEdit/answer.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-27">
+          <caret line="126" column="25" lean-forward="false" selection-start-line="126" selection-start-column="12" selection-end-line="126" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/questionEdit/input.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="135" column="24" lean-forward="true" selection-start-line="135" selection-start-column="24" selection-end-line="135" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/questionEdit/checkbox.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/UEditorFull.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="14" column="41" lean-forward="false" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_add.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="70" column="21" lean-forward="true" selection-start-line="70" selection-start-column="21" selection-end-line="70" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/store/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/store/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="42" column="7" lean-forward="true" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/store/user.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/showUeditor.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="16" column="16" lean-forward="false" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+          <folding>
+            <element signature="n#style#0;n#vue-u-editor#0;n#template#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sasadmin/ueditor1_4_3_3/ueditor.config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="893">
+          <caret line="50" column="26" lean-forward="false" selection-start-line="50" selection-start-column="26" selection-end-line="50" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sasadmin/ueditor1_4_3_3/ueditor.all.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324235">
+          <caret line="17069" column="21" lean-forward="false" selection-start-line="17069" selection-start-column="21" selection-end-line="17069" selection-end-column="21" />
+          <folding>
+            <marker date="1546852609527" expanded="true" signature="401167:401180" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="406135:406152" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="412526:412544" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="516829:516855" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="678856:678990" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="920449:920545" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="963126:963202" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="976559:976577" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="976628:976670" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="976760:976790" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="997690:997762" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1008526:1008552" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1008752:1008843" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1009133:1009208" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1009423:1009438" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1009673:1009727" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1022967:1023060" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1093452:1093524" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1114399:1114411" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1116883:1116907" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1144465:1144471" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1144471:1144477" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1144581:1144587" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1144587:1144593" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1144697:1144703" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1144703:1144709" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1147018:1147024" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1147024:1147030" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148055:1148061" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148061:1148067" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148211:1148217" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148217:1148223" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148369:1148375" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148375:1148381" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148529:1148535" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1148535:1148541" ph=" " />
+            <marker date="1546852609527" expanded="true" signature="1149404:1149415" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1153684:1153697" ph="..." />
+            <marker date="1546852609527" expanded="true" signature="1154090:1154126" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/store/papers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/element-ui/packages/upload/src/index.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="10" column="2" lean-forward="false" selection-start-line="10" selection-start-column="2" selection-end-line="10" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/router/trainningCenter.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="36" lean-forward="false" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="579">
+          <caret line="150" column="16" lean-forward="false" selection-start-line="150" selection-start-column="16" selection-end-line="150" selection-end-column="16" />
+          <folding>
+            <element signature="e#9732#9786#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questionsManagement_show.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="36" column="25" lean-forward="false" selection-start-line="36" selection-start-column="25" selection-end-line="36" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/router/systemManagement.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="28" column="78" lean-forward="false" selection-start-line="28" selection-start-column="78" selection-end-line="28" selection-end-column="78" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/systemManage/teamManage/team_list.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="14" column="35" lean-forward="false" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/questionShow/show.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="579">
+          <caret line="66" column="25" lean-forward="false" selection-start-line="66" selection-start-column="17" selection-end-line="66" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/common/questionEdit/radio.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="328">
+          <caret line="25" column="63" lean-forward="false" selection-start-line="25" selection-start-column="63" selection-end-line="25" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/questionsCenter/questionsManagement/questions_toChannel.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="31" column="51" lean-forward="true" selection-start-line="31" selection-start-column="51" selection-end-line="31" selection-end-column="51" />
+          <folding>
+            <element signature="n#style#0;n#el-button#0;n#el-upload#0;n#el-col#1;n#el-row#1;n#div#0;n#template#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#el-button#0;n#el-upload#0;n#el-col#2;n#el-row#1;n#div#0;n#template#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

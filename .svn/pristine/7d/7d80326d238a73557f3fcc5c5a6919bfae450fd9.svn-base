@@ -1,0 +1,185 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <el-col :span="14" style="margin-bottom:20px">
+            <el-button size="small" type="primary" @click="able('')">批量通过</el-button>
+            <el-button size="small" type="danger" @click="enable('')">批量拒绝</el-button>
+        </el-col>
+        <div id="myTable" ref="myTable">
+            <el-table sortable="custom" align="center" :context="self" :height="dynamicHt" :data="tableData"
+                      tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="20"></el-table-column>
+                <el-table-column prop="name" label="姓名" align="center">
+                </el-table-column>
+                <el-table-column prop="sex" label="性别" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.sex | sex}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="idcard" label="身份证号" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="account" label="账号" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="curSchool" label="所在学校" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="teachCertNo" label="资格证编号" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="realMsg" label="附加信息" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="240">
+                    <template slot-scope="scope">
+                        <el-button size="small" type="success" @click="able(scope.row)">通过
+                        </el-button>
+                        <el-button size="small" type="danger" @click="enable(scope.row)">拒绝</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div style="margin: 10px 50px 10px 0;">
+                <div style="float: right;">
+                    <el-pagination @size-change="changePageSize" @current-change="changePage"
+                                   :current-page.sync="myPages.currentPage" :page-size="myPages.pageSize"
+                                   layout="total,prev, pager, next, jumper" :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    let Util = null;
+    import api from './api'
+
+    export default {
+        data() {
+            return {
+                self: this,
+                totalCount: 0,
+                // loading: false,
+                dynamicHt: 400, // 表格高度
+                multipleSelection: [],
+                operailityData: {},
+                tableData: []
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                this.myPages = Util.pageInitPrams;
+                this.queryQptions = {
+                    url: api.list.path,
+                    params: {
+                        curPage: 1,
+                        pageSize: Util.pageInitPrams.pageSize,
+                        realStatus: '1'
+                    }
+                }
+                this.setTableData();
+            },
+            setTableData(isLoading) {
+                Object.assign(this.queryQptions.params, this.formValidate);
+                this.ajax({
+                    ajaxSuccess: 'listDataSuccess',
+                    ajaxParams: this.queryQptions
+                }, isLoading)
+            },
+            // 数据请求成功回调
+            listDataSuccess(res, m, loading) {
+                this.totalCount = res.data.totalCount || 0;
+                this.tableData = this.addIndex(res.data.dataList || []);
+            },
+            /*
+             * checkbox 选择后触发事件
+             * @param val Array 存在所有的选择每一个行数据
+             */
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            able(item) {
+                if (!item && !this.isSelected()) {
+                    return
+                }
+                Util.todoConfirm({
+                    title: '确定通过该用户的申请吗？',
+                    content: {
+                        id: 'todoId',
+                        title: '通过'
+                    },
+                    data: {
+                        data: {
+                            ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id'),
+                            realStatus: '2'
+                        },
+                        api: api.audit,
+                        msg: '通过'
+                    },
+                    close: () => { //关闭后触发
+                        this.init()
+                    },
+                    confirm: (result) => {
+                    }
+                })
+            },
+            enable(item) { //冻结   解冻
+                if (!item && !this.isSelected()) {
+                    return
+                }
+                Util.todoConfirm({
+                    title: '确定拒绝该用户的申请吗？',
+                    content: {
+                        id: 'todoId',
+                        title: '拒绝该用户'
+                    },
+                    data: {
+                        data: {
+                            ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id'),
+                            realStatus: '3'
+                        },
+                        api: api.audit,
+                        msg: '拒绝'
+                    },
+                    close: () => { //关闭后触发
+                        this.init()
+                    },
+                    confirm: (result) => {
+                    }
+                })
+            },
+            /*
+            * 列表数据只能选择一个
+            * @param isOnly true  是否只选择一个
+            */
+            isSelected(isOnly) {
+                let len = this.multipleSelection.length;
+                let flag = true;
+                if (len == 0) {
+                    this.showMess("请选择数据!");
+                    flag = false;
+                }
+                return flag;
+            }
+            //设置表格及分页的位置
+            // setTableDynHeight() {
+            //     let content = this.$refs.content;
+            //     let parHt = 400;
+            //     let myTable = this.$refs.myTable;
+            //     let paginationHt = 70;
+            //     this.dynamicHt = parHt - myTable.offsetTop - paginationHt;
+            //     // this.$refs.myTable.style.height = this.dynamicHt + 'px';
+            //     // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+            // }
+        },
+        // mounted() {
+        //     //页面dom稳定后调用
+        //     this.$nextTick(function () {
+        //         //初始表格高度及分页位置
+        //         this.setTableDynHeight();
+        //         //为窗体绑定改变大小事件
+        //         let Event = Util.events;
+        //         Event.addHandler(window, "resize", this.setTableDynHeight);
+        //     })
+        // }
+    }
+
+</script>

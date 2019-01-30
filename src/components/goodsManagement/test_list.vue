@@ -1,0 +1,236 @@
+<template>
+  <div class="cgt-content">
+    <subject-head @change="changeHeader" :showItems="showItems" :selectItems="selectItems"></subject-head>
+    <el-form :rules="rules" ref="searchObj" :model="searchObj" label-width="80px" class="demo-ruleForm" inline>
+      <el-row class="search-from">
+        <el-form-item label="试卷类型" prop="papersTypes">
+          <el-select size="small" v-model="searchObj.papersTypes" placeholder="">
+            <el-option label="全部" value=""></el-option>
+            <el-option label="试卷" value="1"></el-option>
+            <el-option label="联考" value="2"></el-option>
+            <el-option label="测验" value="3"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="年届" prop="years">
+          <el-select size="small" v-model="searchObj.years" placeholder="">
+            <el-option label="全部" value=""></el-option>
+            <el-option v-for="index in 10" :label="new Date().getFullYear()-index+1"
+                       :value="new Date().getFullYear()-index+1" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="试卷名称" prop="name">
+          <el-input size="small" v-model="searchObj.name"></el-input>
+        </el-form-item>
+        <el-button size="small" type="primary" @click="searchEvent">搜索</el-button>
+      </el-row>
+    </el-form>
+    <div class="clearfix">
+      <div class="left ">
+        <div class="paper-list" style="width: 472px;">
+          <div v-for="(item,index) in paperList" class="paper-item">
+            <el-button size="mini" type="success" plain @click="add(item)">添加</el-button>
+            <p class="paper-title"><span class="exam-title">{{item.name}}</span> <span
+              class="exam-date">考试时间:{{item.examDate | formatDate }}</span></p>
+            <p>
+              <span>卷号:{{item.no}}</span>
+              <span>总分:{{item.score}}</span>
+              <span>答题时长:{{item.times / 60}}</span>
+              <span>类型:{{item.papersTypes | paperTypesText }}</span>
+            </p>
+          </div>
+        </div>
+        <div style="margin: 10px 50px 10px 0;">
+          <div style="float: right;">
+            <el-pagination
+              @size-change="changePageSize"
+              @current-change="changePage"
+              :current-page.sync="myPages.currentPage"
+              :page-size="myPages.pageSize"
+              layout="total,prev, pager, next, jumper"
+              :total="totalCount">
+            </el-pagination>
+          </div>
+        </div>
+      </div>
+      <div class="right  paper-list" style="width: 472px;">
+        <div v-for="(item,index) in choiceList" class="paper-item">
+          <el-button size="mini" type="warning" plain @click="remove(index)">删除</el-button>
+          <p class="paper-title">{{item.name}}</p>
+          <p>
+            <span>卷号:{{item.no}}</span>
+            <span>总分:{{item.score}}</span>
+            <span>答题时长:{{item.times / 60}}</span>
+            <span>类型:{{item.papersTypes | paperTypesText }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--<el-transfer style="margin-left:28%" v-model="choiceList" :data="paperList"></el-transfer>-->
+    <el-row class="buttom">
+      <el-button size="small" class="search-btn" @click="submit">确定</el-button>
+      <el-button class="tableMakeItemCancel" size="small" @click="cancle">取消</el-button>
+    </el-row>
+  </div>
+</template>
+<script>
+    import subjectHead from '@/components/common/subjectHead.vue'
+    import { testList as rules } from './integralManage/rules'
+
+    let Util = null
+    export default {
+        props: ['papers'],
+        data () {
+            return {
+                rules,
+                choiceList: [],
+                paperList: [],
+                totalCount: 10,
+                showItems: ['textbookVersion', 'subject', 'grade'],
+                selectItems: {
+                    subject: 'Chinese',
+                    textbookVersion: '',
+                    grade: 1,
+                },
+                searchObj: {
+                    subject: 'Chinese',
+                    textbookVersionId: '',
+                    grade: '1',
+                },
+            }
+        },
+        created () {
+            this.init()
+        },
+        methods: {
+            init () {
+                Util = this.$util
+                this.myPages = Util.pageInitPrams
+                this.queryQptions = {
+                    url: '/papers/list',
+                    params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize},
+                }
+                this.setTableData()
+            },
+            /*
+             * 设置表格数据
+             * @param isLoading Boolean 是否加载
+             */
+            setTableData (isLoading) {
+                Object.assign(this.queryQptions.params, this.searchObj)
+                this.ajax({
+                    ajaxSuccess: 'listDataSuccess',
+                    ajaxParams: this.queryQptions,
+                }, isLoading)
+            },
+            // 数据请求成功回调
+            listDataSuccess (res, m, loading) {
+                this.totalCount = res.data.totalCount || 0
+                this.paperList = this.addIndex(res.data.dataList || [])
+            },
+            //搜索查询
+            searchEvent () {
+                let isSubmit = this.handleSubmit('searchObj')
+                if (isSubmit) {
+                    this.setTableData()
+                }
+            },
+            /*
+           * 列表查询方法
+           * @param string 查询from的id
+           * */
+            handleSubmit (name) {
+                let flag = false
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        flag = true
+                    } else {
+                        this.errorMess('表单验证失败!')
+                    }
+                })
+                return flag
+            },
+            //筛选
+            changeHeader (obj, select) {
+                console.log(obj, select)
+                for (let key in this.searchObj) {
+                    this.searchObj[key] = select[key] && select[key] || ''
+                }
+                if (obj.subject != '') {
+                    this.searchObj.subject = obj.subject.code
+                }
+                this.searchObj.textbookVersionId = select.textbookVersion
+                this.init()
+            },
+            add (obj) {
+                if (this.choiceList.indexOf(obj) > 0) return false
+                this.choiceList.push(obj)
+            },
+            remove (index) {
+                this.choiceList.splice(index, 1)
+            },
+            submit () {
+                let arr = []
+                this.choiceList.map(function (item) {
+                    arr.push(item.id)
+                })
+                this.searchObj.ids = arr
+                this.$emit('choice', this.searchObj)
+            },
+            cancle () {
+                this.$emit('cancel', 'add')
+            },
+        },
+        components: {
+            subjectHead,
+        },
+    }
+</script>
+
+<style lang="scss">
+  .cgt-content {
+    .paper-list {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px;
+      height: 400px;
+      overflow-y: scroll;
+      .paper-item {
+        position: relative;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 20px 0;
+        .el-button {
+          position: absolute;
+          right: 10px;
+          top: 3px;
+        }
+      }
+      .paper-title {
+        font-size: 17px;
+        line-height: 34px;
+        /*padding-left: 20px;*/
+      }
+      p {
+        span {
+          font-size: 14px;
+          margin-right: 20px;
+          line-height: 20px;
+        }
+        .exam-date {
+          margin-left: 0px;
+        }
+        .exam-title {
+          width: 193px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+    .buttom {
+      text-align: center;
+      margin-top: 20px;
+    }
+  }
+
+</style>

@@ -1,0 +1,414 @@
+<!--
+****--@file     list
+****--@date     2018/1/2 11:44
+****--@author   YC
+****--@describe 赛季
+-->
+<template>
+    <div class="seasonMain">
+        <el-card class="box-card">
+            <div slot="header" class="clearfix">
+                <span>赛季配置</span>
+              <el-button style="background: #11A63F;color: #fff;padding: 10px 20px;float: right" type="text"
+                         @click="add" class="greenButton">
+                    新增赛季
+                </el-button>
+            </div>
+            <el-table align="center" :context="self" :maxHeight="dynamicHt" :data="tableData" tooltip-effect="dark"
+                      style="width: 100%">
+              <el-table-column prop="index" align="center" label="序号" width="70px"
+                               show-overflow-tooltip></el-table-column>
+                <el-table-column label="标题" prop="title" show-overflow-tooltip></el-table-column>
+                <el-table-column label="开始时间" align="center" prop="startTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.startTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="结束时间" align="center" prop="endTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.endTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                    </template>
+                </el-table-column>
+                <!--<el-table-column label="操作" align="center" width="70">-->
+                <!--<template slot-scope="scope">-->
+                <!--<el-button :disabled="scope.row.startTime < (new Date().getTime())" size="small" type="success"-->
+                <!--@click="edit(scope.row)">-->
+                <!--修改-->
+                <!--</el-button>-->
+                <!--</template>-->
+                <!--</el-table-column>-->
+            </el-table>
+
+            <div class="pageBox">
+                <div style="float: right;">
+                    <el-pagination
+                            @size-change="changePageSize"
+                            @current-change="changePage"
+                            :current-page.sync="myPages.currentPage"
+                            :page-size="myPages.pageSize"
+                            layout="total,prev, pager, next, jumper"
+                            :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+
+        </el-card>
+        <!--新增-->
+        <Modal :mask-closable="false" width="600" v-model="addModal" class-name="vertical-center-modal"
+               :loading="loading">
+            <modal-header slot="header" :content="addId"></modal-header>
+            <edit v-if="addModal" @cancel="cancel" @add="subCallback"></edit>
+            <div slot="footer"></div>
+        </Modal>
+        <!--修改-->
+        <Modal :mask-closable="false" width="600" v-model="editModal" class-name="vertical-center-modal"
+               :loading="loading">
+            <modal-header slot="header" :content="editId"></modal-header>
+            <edit v-if="editModal" @cancel="cancel" @edit="subCallback" :operailityData="operailityData"></edit>
+            <div slot="footer"></div>
+        </Modal>
+        <el-card class="box-card" style="margin-top: 10px">
+
+            <div slot="header" class="clearfix">
+                <span>虚拟币配置:</span>
+            </div>
+            <p class="ppp">虚拟币兑换人民币: 虚拟币<input type="text" @blur="modifyPro" v-model="B_RMB" class="Systemconfig-input"/>=
+                <input type="text" class="Systemconfig-input" @blur="modifyPro" v-model="RMB"/> <span>注：多少人民币兑换多少虚拟币</span></p>
+        </el-card>
+        <el-card class="box-card" style="margin-top: 10px">
+
+            <div slot="header" class="clearfix">
+                <span>积分配置:</span>
+            </div>
+            <p class="ppp">首次登录：<input type="text" v-model="form.FIRST_LOGIN_INTERGAL"
+                                       @blur="modifycen('FIRST_LOGIN_INTERGAL',form.FIRST_LOGIN_INTERGAL)"
+                                       class="Systemconfig-input"/>积分 <span>注：用户首次登录平台奖励积分数</span>
+            </p>
+            <p class="ppp">办理会员：<input type="text" v-model="form.OPEN_VIP_INTERGAL"
+                                       @blur="modifycen('OPEN_VIP_INTERGAL',form.OPEN_VIP_INTERGAL)"
+                                       class="Systemconfig-input"/>积分 <span>注：用户注册会员奖励积分数</span>
+            </p>
+            <p class="ppp">完成实名：<input type="text" v-model="form.REAL_NAME_INTERGAL"
+                                       @blur="modifycen('REAL_NAME_INTERGAL',form.REAL_NAME_INTERGAL)"
+                                       class="Systemconfig-input"/>积分 <span>注：用户完成实名奖励积分数</span>
+            </p>
+            <p class="ppp">完善资料：<input type="text" v-model="form.PERFECT_INFO_INTERGAL"
+                                       @blur="modifycen('PERFECT_INFO_INTERGAL',form.PERFECT_INFO_INTERGAL)"
+                                       class="Systemconfig-input"/>积分 <span>注：用户完善资料达到100%奖励积分数</span>
+            </p>
+        </el-card>
+        <el-card class="box-card" style="margin-top: 10px">
+
+            <div slot="header" class="clearfix">
+                <span>会员配置:</span>
+            </div>
+            <p class="ppp" v-for="(item,index) in vip">{{item.remark}}：
+                <input type="text" v-model="item.currentPrice" @blur="changeVip(item.id,item.discount,item.currentPrice)"
+                       class="Systemconfig-input"/>元
+                <span>折扣：
+          <el-select v-model="item.discount" @change="changeVip(item.id,item.discount,item.currentPrice)"
+                     placeholder="请选择">
+    <el-option
+            v-for="item1 in options"
+            :key="item1.value"
+            :label="item1.label"
+            :value="item1.value">
+    </el-option>
+  </el-select>
+        </span>
+                <span>折扣价:<span style="font-weight: bold;color: rgb(17, 166, 63);margin: 0 5px">{{item.discount *
+        item.currentPrice / 10}}</span>元</span>
+            </p>
+            <p class="ppp">会员提问赠送积分： <input type="text"
+                                            @blur="modifycen('MEMBER_QUESTIONS_INTEGRAL',form.MEMBER_QUESTIONS_INTEGRAL)"
+                                            v-model="form.MEMBER_QUESTIONS_INTEGRAL"
+                                            class="Systemconfig-input"/> 积分</p>
+
+        </el-card>
+        <el-card class="box-card" style="margin-top: 10px">
+
+            <div slot="header" class="clearfix">
+                <span>升为名师:</span>
+            </div>
+            <p class="ppp">答疑被采纳数 <input type="text" @blur="modifycen('ADOPT_NUM',form.ADOPT_NUM)" v-model="form.ADOPT_NUM"
+                                         class="Systemconfig-input"/> 道</p>
+        </el-card>
+    </div>
+</template>
+<style lang="scss">
+    .seasonMain {
+        .pageBox {
+            margin: 10px 50px 10px 0;
+            overflow: hidden;
+        }
+        .Systemconfig-input {
+            border: 1px solid #e6ebf5;
+            width: 60px;
+            height: 30px;
+            margin: 0 5px;
+            padding: 0 10px;
+            line-height: 30px;
+        }
+        .ppp {
+            padding-left: 50px;
+            line-height: 40px;
+            span {
+                margin-left: 40px;
+            }
+        }
+    }
+</style>
+<script>
+  /*当前组件必要引入*/
+  import api from './api'
+  import edit from './input'
+
+  //当前组件引入全局的util
+  let Util = null
+  export default {
+    data () {
+      return {
+        self: this,
+        loading: false,
+        dynamicHt: 300,
+        tableData: [],
+        totalCount: 0,
+        operailityData: {},
+        addId: {title: '添加赛季', id: 'addId'},
+        editId: {title: '修改赛季', id: 'editId'},
+        form: {},
+        B_RMB: '',
+        RMB: '',
+        checked: '',
+        checked1: '',
+        vip: [],
+        options: [
+          {
+            value: '1',
+            label: '一折',
+          }, {
+            value: '2',
+            label: '二折',
+          }, {
+            value: '3',
+            label: '三折',
+          }, {
+            value: '4',
+            label: '四折',
+          }, {
+            value: '5',
+            label: '五折',
+          }, {
+            value: '6',
+            label: '六折',
+          }, {
+            value: '7',
+            label: '七折',
+          }, {
+            value: '8',
+            label: '八折',
+          }, {
+            value: '9',
+            label: '九折',
+          }, {
+            value: '10',
+            label: '原价',
+          }],
+        reg: /^[0-9]{0,8}$/,
+      }
+    },
+    methods: {
+
+      modifyPro () {
+
+        if (!this.reg.test(this.B_RMB) || !this.reg.test(this.RMB)) {
+          this.$message({
+            message: '请输入不大于8位数字',
+            type: 'error',
+          })
+          return false
+        }
+        this.ajax({
+          ajaxSuccess: 'setB',
+          ajaxParams: {
+            url: api.save.path,
+            method: api.save.method,
+            data: {
+              code: 'B_RMB',
+              value: this.B_RMB + '=' + this.RMB,
+            },
+          },
+        })
+
+      },
+      modifycen (m, n) {
+        if (!this.reg.test(n)) {
+          this.$message({
+            message: '请输入不大于8位数字',
+            type: 'error',
+          })
+          return false
+        }
+        this.ajax({
+          ajaxSuccess: 'setB',
+          ajaxParams: {
+            url: api.save.path,
+            method: api.save.method,
+            data: {
+              code: m,
+              value: n,
+            },
+          },
+        })
+      },
+      changeVip (m, n, z) {
+        if (!this.reg.test(z)) {
+          this.$message({
+            message: '请输入不大于8位数字',
+            type: 'error',
+          })
+          return false
+        }
+        this.ajax({
+          ajaxSuccess: 'setB',
+          ajaxParams: {
+            url: api.modifyVip.path,
+            method: api.modifyVip.method,
+            data: {
+              id: m,
+              discount: n,
+              currentPrice: z,
+            },
+          },
+        })
+      },
+      setB () {
+        this.$message({
+          message: '修改成功',
+          type: 'success',
+        })
+
+      },
+      //初始化请求列表数据
+      init () {
+        Util = this.$util
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize},
+        }
+        this.setTableData()
+        this.getSave()
+        this.getVipConfig()
+      },
+      getSave () {//获取系统配置
+        this.ajax({
+          ajaxSuccess: 'getSaveSuccess',
+          ajaxParams: {
+            url: api.getConfig.path,
+            method: api.getConfig.method,
+          },
+        })
+      },
+      getVipConfig () {//获取会员价格
+        this.ajax({
+          ajaxSuccess: 'getVipeSuccess',
+          ajaxParams: {
+            url: api.getVipConfig.path,
+            method: api.getVipConfig.method,
+          },
+        })
+      },
+      getVipeSuccess (res) {
+        this.vip = res.data
+        for (var i = 0; i < this.vip.length; i++) {
+          this.vip[i].discount = this.vip[i].discount.toString()
+        }
+
+      },
+      getSaveSuccess (res) {
+        console.log(res)
+        this.form = res.data
+        var data = res.data.B_RMB.split('=')
+        this.B_RMB = data[0]
+        this.RMB = data[1]
+      },
+      /*
+      * 设置表格数据
+      * @param isLoading Boolean 是否加载
+      */
+      setTableData (isLoading) {
+        this.ajax({
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: this.queryQptions,
+        }, isLoading)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        console.log(res)
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = this.addIndex(res.data.dataList || [])
+      },
+      //新增
+      add () {
+        this.openModel('add')
+      },
+      //修改
+      edit (item) {
+        this.operailityData = item
+        this.openModel('edit')
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:根据不同的参数关闭对应的模态
+      * @param targer string example:"add"、"edit"
+      * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+      * @param targer string example:"add"、"edit"
+      * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+      * 例如:errorTitle、errorTitle
+      *addMessTitle:{
+      *    type:'add',
+      *    successTitle:'添加成功!',
+      *    errorTitle:'添加失败!',
+      *    ajaxSuccess:'ajaxSuccess',
+      *    ajaxError:'ajaxError',
+      *    ajaxParams:{
+      *      url:'/role/add',
+      *      method:'post'
+      *    }
+      *    }
+      * @param udata boolean 默认false  是否不需要刷新当前表格数据
+      * */
+      subCallback (target, title, updata) {
+        target && this.cancel(target)
+        title && this.successMess(title)
+        if (!updata) {
+          this.setTableData()
+        }
+      },
+      /*
+      * 打开指定的模态窗体
+      * @param options string 当前指定的模态:"add"、"edit"
+      * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+    },
+    components: {
+
+      edit,
+    },
+  }
+
+</script>

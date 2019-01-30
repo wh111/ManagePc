@@ -1,0 +1,402 @@
+<template>
+    <div class="moudle-wrap modal clearfix csml-content" id="content" ref="content">
+        <el-row>
+          <el-col class="bottom" style="margin-top: 10px">
+              <el-button size="small" class="greenButton" @click="versionAdd">新增教材版本</el-button>
+            </el-col>
+            <el-col class="bottom" ref="versionList">
+                <!--<a v-for="tag in versionList" @click="chioceTextbook(tag)">-->
+                <!--<el-tag-->
+                <!--:key="tag.id"-->
+                <!--closable-->
+                <!--:type="isActive(tag)?'success':'primary'"-->
+                <!--@close="handleClose(tag)">-->
+                <!--{{tag.name}}-->
+                <!--</el-tag>-->
+                <!--</a>-->
+              <el-button style="padding: 6px 15px" size="small" class="tableMakeItem" @click="chioceTextbookAll">全部
+              </el-button>
+                <span style="padding: 0 10px;cursor: pointer;" v-for="(item,index) in versionList" :key="item.id"
+                      @click="chioceTextbook(item)">
+                    <el-tag
+                            :key="item.id"
+                            :closable="true"
+                            size="medium"
+                            :class=" tag == item ? 'active_btn' : '' "
+                            @close="handleClose(item,$event)">
+                        {{item.name}}
+                    </el-tag>
+                </span>
+            </el-col>
+            <el-col class="bottom">
+              <el-button :disabled=" Textbook.id == ''" size="small" class="greenButton" @click="add">新增教材</el-button>
+            </el-col>
+        </el-row>
+        <div id="myTable" ref="myTable">
+            <el-table align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                      style="width: 100%">
+              <el-table-column prop="index" align="center" label="序号" width="70px"
+                               show-overflow-tooltip></el-table-column>
+                <el-table-column label="教材版本" prop="name" width="120" show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column label="类型" align="center" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.grade | grade }}</span>
+                        <span>{{ scope.row.subject | subject }}</span>
+                        <span>{{ scope.row.term | term }}</span>
+                        <span>{{ scope.row.name }}教材</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="录入时间" align="center" prop="createTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.createTime | formatDate('yyyy-MM-dd HH:mm') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="更改时间" align="center" prop="updateTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.updateTime | formatDate('yyyy-MM-dd HH:mm') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center">
+                    <template slot-scope="scope">
+                      <el-button size="small" class="tableMakeItem" @click="show(scope.row)">查看</el-button>
+                      <el-button size="small" class="tableMakeItem" @click="edit(scope.row)">修改</el-button>
+                      <el-button size="small" class="tableMakeItem" @click="remove(scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div style="margin: 10px 50px 10px 0;">
+                <div style="float: right;">
+                    <el-pagination
+                            @size-change="changePageSize"
+                            @current-change="changePage"
+                            :current-page.sync="myPages.currentPage"
+                            :page-size="myPages.pageSize"
+                            layout="total,prev, pager, next, jumper"
+                            :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+        <!--查看弹窗-->
+        <!--<el-dialog title="查看教材" :visible.sync="showModal" width="1000px">-->
+        <!--<show v-if="showModal" @cancel="cancel" @add="subCallback" :operaility-data="operailityData"></show>-->
+        <!--<div slot="footer" class="dialog-footer"></div>-->
+        <!--</el-dialog>-->
+        <!--修改弹窗-->
+        <!--<el-dialog title="修改教材" :visible.sync="editModal" width="1000px">-->
+        <!--<edit v-if="editModal" @cancel="cancel" @edit="subCallback" :operaility-data="operailityData"></edit>-->
+        <!--<div slot="footer" class="dialog-footer"></div>-->
+        <!--</el-dialog>-->
+        <!--删除-->
+        <!--<el-dialog title="删除" :visible.sync="removeModal" width="800px">-->
+        <!--<remove v-if="removeModal" :delete-url="deleteUrl" @remove="subCallback" @cancel="cancel" :operaility-data="operailityData"></remove>-->
+        <!--<div slot="footer" class="dialog-footer"></div>-->
+        <!--</el-dialog>-->
+    </div>
+</template>
+<script>
+  let Util = null
+  import versionAdd from './material_version_add.vue'
+  import add from './material_add'
+  import edit from './material_edit'
+  import show from './material_show'
+  import api from './api'
+
+  export default {
+    data () {
+      return {
+        //* 表格 *//
+        self: this,
+        tag: {},
+        totalCount: 0,
+        // loading: false,
+        dynamicHt: 100, // 表格高度
+        multipleSelection: [],
+        operailityData: {},
+        tableData: [],
+        versionList: [],
+        Textbook: {
+          id: '',
+          name: ''
+        },
+        addVersionModal: false
+        //deleteUrl:api.delete.path,
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      init () {//初始化函数
+        Util = this.$util
+        this.ajax({
+          ajaxSuccess: res => this.versionList = res.data,
+          ajaxParams: {
+            url: api.versionall.path,
+            method: api.versionall.method
+          }
+        })
+
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {
+            curPage: 1,
+            pageSize: Util.pageInitPrams.pageSize,
+          },
+        }
+        this.setTableData()
+      },
+      isActive (tag) {
+        this.tag = tag
+      },
+      /*
+      * 知识点删除回调
+      * **/
+      handleClose (tag, $event) {
+        $event.preventDefault()
+        Util.todoConfirm({
+          title: '确定删除教材版本吗？',
+          content: {id: 'todoId', title: '删除教材版本'},
+          data: {
+            data: {ids: Util.getStrByArr([tag], 'id')},
+            api: api.versionRemove,
+            msg: '删除'
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {
+          }
+        })
+      },
+      chioceTextbook (val) {
+        this.tag = val
+        this.Textbook = val
+        this.setTableData()
+      },
+      chioceTextbookAll () {
+        this.tag = {
+          id: '',
+          name: '',
+          remark: null,
+          subject: null,
+          textbookVersionId: null
+        }
+        this.Textbook = {
+          id: '',
+          name: '',
+          remark: null,
+          subject: null,
+          textbookVersionId: null
+        }
+        this.setTableData()
+      },
+      remove (item) {
+        Util.todoConfirm({
+          title: '确定删除教材吗？',
+          content: {id: 'todoId', title: '删除教材'},
+          data: {
+            data: {ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id')},
+            api: api.remove,
+            msg: '删除'
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {
+          }
+        })
+      },
+      show (item) {//查看
+        Util.dialog({
+          title: '查看',
+          width: '1000px',
+          content: {id: 'showId', title: '查看'},
+          component: show,
+          data: {
+            dialogData: item
+          },
+          close: () => {//关闭后触发
+//              this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      edit (item) {//修改
+        Util.dialog({
+          title: '修改',
+          width: '1000px',
+          content: {id: 'editId', title: '修改'},
+          component: edit,
+          that: this,
+          data: {
+            dialogData: item
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      versionAdd () {//新增教材版本
+        Util.dialog({
+          title: '新增教材版本',
+          width: '1000px',
+          content: {id: 'addId', title: '新增教材版本'},
+          component: versionAdd,
+          that: this,
+          data: {},
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      add () {//新增
+//            this.openModel('add')
+        Util.dialog({
+          title: '新增教材',
+          width: '1000px',
+          content: {id: 'addId', title: '新增教材'},
+          component: add,
+          that: this,
+          data: {
+            dialogData: this.Textbook
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      /*
+      * 设置表格数据
+      * @param isLoading Boolean 是否加载
+      */
+      setTableData (isLoading) {
+        Object.assign(this.queryQptions.params, {textbookVersionId: this.Textbook.id})
+        this.ajax({
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: this.queryQptions
+        }, isLoading)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = this.addIndex(res.data.dataList || [])
+      },
+      //设置表格及分页的位置
+      setTableDynHeight () {
+        let content = this.$refs.content
+        let parHt = content.parentNode.offsetHeight
+//        let versionListHeight = this.$refs.versionList;
+        let myTable = this.$refs.myTable
+        let paginationHt = 80
+        this.dynamicHt = parHt - myTable.offsetTop - paginationHt
+        this.$refs.myTable.style.height = this.dynamicHt + 'px'
+        // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:根据不同的参数关闭对应的模态
+      * @param targer string example:"add"、"edit"
+      * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+      * @param targer string example:"add"、"edit"
+      * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+      * 例如:errorTitle、errorTitle
+      *addMessTitle:{
+      *    type:'add',
+      *    successTitle:'添加成功!',
+      *    errorTitle:'添加失败!',
+      *    ajaxSuccess:'ajaxSuccess',
+      *    ajaxError:'ajaxError',
+      *    ajaxParams:{
+      *      url:'/role/add',
+      *      method:'post'
+      *    }
+      *    }
+      * @param udata boolean 默认false  是否不需要刷新当前表格数据
+      * */
+      subCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.setTableData()
+          this.ajax({
+            ajaxSuccess: res => this.versionList = res.data,
+            ajaxParams: {
+              url: api.versionall.path,
+              method: api.versionall.method
+            }
+          })
+        }
+      },
+      addVersionCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.ajax({
+            ajaxSuccess: res => this.versionList = res.data,
+            ajaxParams: {
+              url: api.versionall.path,
+              method: api.versionall.method
+            }
+          })
+        }
+      },
+      /*
+      * 打开指定的模态窗体
+      * @param options string 当前指定的模态:"add"、"edit"
+      * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      }
+    },
+    mounted () {
+      //页面dom稳定后调用
+      this.$nextTick(function () {
+        //初始表格高度及分页位置
+        this.setTableDynHeight()
+        //为窗体绑定改变大小事件
+        let Event = Util.events
+        Event.addHandler(window, 'resize', this.setTableDynHeight)
+      })
+    },
+    components: {
+      show, add, edit, versionAdd
+    }
+  }
+</script>
+<style lang="scss">
+    .csml-content {
+        .active_btn {
+            color: #FFFFFF;
+            background-color: #11A63F;
+            border-color: #11A63F;
+        }
+        .bottom {
+            margin-bottom: 20px
+        }
+    }
+
+</style>

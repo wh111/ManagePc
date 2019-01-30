@@ -1,0 +1,396 @@
+<template>
+  <el-row id="content" class="cuta_content">
+    <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="160px">
+      <p>基本信息</p>
+      <el-form-item label="教师账号：" :span="8" prop="account">
+        <el-input size="small" v-model="formValidate.account"></el-input>
+      </el-form-item>
+      <el-form-item label="教师姓名：" :span="8" prop="name">
+        <el-input size="small" v-model="formValidate.name"></el-input>
+      </el-form-item>
+      <el-form-item label="性别：" prop="sex">
+        <el-select size="small" v-model="formValidate.sex" placeholder="请选择">
+          <el-option label="男" :value="0"></el-option>
+          <el-option label="女" :value="1"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="教师手机号：" prop="mobile">
+        <el-input size="small" v-model="formValidate.mobile"></el-input>
+      </el-form-item>
+      <el-form-item label="生日：" prop="birth">
+        <el-date-picker
+          v-model="formValidate.birth"
+          type="date"
+          :editable="false"
+          placeholder="选择时间">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="身份证号：" :span="8" prop="idcard">
+        <el-input size="small" v-model="formValidate.idcard"></el-input>
+      </el-form-item>
+      <el-form-item label="上传身份证：">
+        <el-col :span="14">
+          <up-load-photo-well @upladSuccess="upladIdcardImgs1Success" :onlyOnePic="true"
+                              :fileList="idcard1ImgsShow"></up-load-photo-well>
+          <p>身份证正面照</p>
+        </el-col>
+        <el-col :span="6">
+          <up-load-photo-well @upladSuccess="upladIdcardImgs2Success" :onlyOnePic="true"
+                              :fileList="idcard2ImgsShow"></up-load-photo-well>
+          <p>身份证背面照</p>
+        </el-col>
+      </el-form-item>
+      <p>学历信息</p>
+      <el-form-item label="最高学历：" prop="degree">
+        <el-input v-model="formValidate.degree"></el-input>
+      </el-form-item>
+      <el-form-item label="毕业学校：" prop="school">
+        <el-input size="small" v-model="formValidate.school"></el-input>
+      </el-form-item>
+      <el-form-item label="毕业时间：" prop="times">
+        <el-date-picker
+          v-model="formValidate.times"
+          :editable="false"
+          type="date"
+          placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+      <p>教学信息</p>
+      <el-form-item label="教师资格证编号：" prop="teachCertNo">
+        <el-input v-model="formValidate.teachCertNo"></el-input>
+      </el-form-item>
+      <el-form-item label="上传教师资格证：">
+        <up-load-photo-well @upladSuccess="upladTeachCertImgsSuccess"
+                            :fileList="teachCertImgsShow"></up-load-photo-well>
+      </el-form-item>
+      <el-form-item label="所属机构：" prop="orgId">
+        <el-select v-model="formValidate.orgId" placeholder="请选择">
+          <el-option v-for="(item,index) in organization" :key="index" :label="item.title"
+                     :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="资格种类：" prop="types">
+        <el-select size="small" v-model="formValidate.types" placeholder="请选择" @change="changeTeacherTypes">
+          <el-option label="小学教师" :value="0"></el-option>
+          <el-option label="初中教师" :value="1"></el-option>
+          <el-option label="高中教师" :value="2"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="任教学科：" prop="subject">
+        <el-select v-model="formValidate.subject" placeholder="请选择">
+          <el-option v-for="(item,index) in subjectList" :key="index" :label="item.value"
+                     :value="item.code"></el-option>
+        </el-select>
+      </el-form-item>
+      <span style="height: 0;visibility: hidden;display: none">{{formValidate}}</span>
+      <el-form-item label="使用教材：" prop="textbookVersionId">
+        <el-select v-model="formValidate.textbookVersionId" @change="selectSubject" placeholder="请选择"
+                   style="width: 130px">
+          <el-option
+            v-for="item in textbookVersionList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="教学经验：" prop="teachYears">
+        <el-input v-model="formValidate.teachYears"></el-input>
+        年
+      </el-form-item>
+    </el-form>
+    <div class="head-box">
+      <up-header @upladSuccess="setUploadHeaderSuccessUrl" :imgFile="imgSrc" :actionUrl="uploadHeaderUrl"
+                 :avatarTips="false"></up-header>
+    </div>
+    <el-col align="center">
+      <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+      <el-button size="small" @click="cancle" class="tableMakeItemCancel">取消</el-button>
+    </el-col>
+  </el-row>
+</template>
+<script>
+    let Util = null
+
+    import api from './api'
+    import { add as rules } from './rules'
+    import upHeader from '../../common/uploadHeader.vue'
+    import upLoadPhotoWell from '../../common/upLoadPhotoWell'
+
+    export default {
+        props: ['operailityData'],
+        data () {
+            return {
+                rules,
+                imgSrc: '',
+                organization: [],
+                subjectList: [],
+                idcard1Imgs: [], // 正
+                idcard2Imgs: [], // 反
+                // 图片查看
+                idcard1ImgsShow: [],
+                idcard2ImgsShow: [],
+                teachCertImgsShow: [],
+                textbookVersionList: [],
+                //上传头像
+                uploadHeaderUrl: '/file/uploadImg',
+                formValidate: {
+                    textbookVersionList: [
+                        {
+                            subject: '',
+                            textbookVersionId: '',
+                            textbookVersionName: '',
+                        }],
+                    id: '',
+                    account: '',
+                    mobile: '',
+                    name: '',
+                    sex: '0',
+                    birth: '',
+                    idcard: '',
+                    degree: '',
+                    school: '',
+                    times: '',
+                    teachCertNo: '',
+                    orgId: '',
+                    types: '0',
+                    subject: '',
+                    teachYears: '',
+                    icon: '',
+                    idcardImgs: '',
+                    teachCertImgs: '',
+                    realStatus: '2',
+                    textbookVersionId: '',
+                },
+                loadBtn: {title: '提交', callParEvent: 'listenSubEvent'},
+            }
+        },
+        created () {
+            this.init()
+            this.getOrganization()
+            this.getShowData()
+            this.textbookVersionList = this.$store.state.app.envs.textBookVersionList
+        },
+        methods: {
+            init () {
+                Util = this.$util
+                this.changeTeacherTypes(0)
+            },
+            queryTextbookVersion () {//获取教材版本
+                this.ajax({
+                    ajaxSuccess: (res) => { this.textbookVersionList = res.data},
+                    ajaxParams: {
+                        //baseURL:'PUBLIC',
+                        url: api.queryTextbookVersion.path,
+                        method: api.queryTextbookVersion.method,
+                        params: {
+                            subject: this.formValidate.subject,
+                        },
+                    },
+                })
+            },
+            selectSubject (val) {//选择教材
+                console.log(this.formValidate.textbookVersionId, val)
+                this.formValidate.textbookVersionId = val
+                this.formValidate.textbookVersionList[0].textbookVersionId = this.formValidate.textbookVersionId
+            },
+            getShowData () {
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (!(res.data instanceof Object)) {
+                            return
+                        }
+
+                        this.formValidate = res.data
+//                        this.formValidate.types = Number(this.formValidate.types)
+//                        this.formValidate.sex = Number(this.formValidate.sex)
+                        if (this.formValidate.textbookVersionList.length != 0) {
+                            this.queryTextbookVersion()
+                            this.formValidate.textbookVersionId = this.formValidate.textbookVersionList[0].textbookVersionId
+
+                        } else {
+                            this.formValidate.textbookVersionId = ''
+                            this.formValidate.textbookVersionList = [
+                                {
+                                    subject: '',
+                                    textbookVersionId: '',
+                                    textbookVersionName: '',
+                                }]
+                        }
+
+                        this.imgSrc = this.getStaticPath(res.data.icon)
+                        let idcardImgs = res.data.idcardImgs && res.data.idcardImgs.split(',') || []
+                        if (idcardImgs.length) {
+                            this.idcard1ImgsShow = [{url: this.getStaticPath(idcardImgs[0]), path: idcardImgs[0]}]
+                            this.idcard2ImgsShow = [{url: this.getStaticPath(idcardImgs[1]), path: idcardImgs[1]}]
+                            this.idcard1Imgs = [idcardImgs[0]]
+                            this.idcard2Imgs = [idcardImgs[1]]
+                        }
+
+                        let teachCertImgsArr = []
+                        let teachCertImgs = res.data.teachCertImgs && res.data.teachCertImgs.split(',') || []
+                        teachCertImgs.map(item => {
+                            teachCertImgsArr.push({url: this.getStaticPath(item), path: item})
+                        })
+                        this.teachCertImgsShow = teachCertImgsArr
+                    },
+                    ajaxError: 'ajaxError',
+                    ajaxParams: {
+                        url: api.get.path,
+                        method: api.get.method,
+                        params: {
+                            id: this.operailityData.id,
+                        },
+                    },
+                }
+                this.ajax(opt)
+            },
+            changeTeacherTypes (val) {
+                let data = [6, 9, 12]
+                this.formValidate.subject = ''
+                this.subjectList = this.$store.getters['app/gradeMap'](data[val])
+            },
+            /*
+            * 设置是否显示上传头像loading
+            *
+            * @param resData  {}  上传成功后后台返回的数据 {"relativePathFile":"img/2017/04/28/20170428093435979.png","staticUrl":"http://ip:port/static/"}
+            *
+            * @param imgSrc  string  头像路径
+            * */
+            setUploadHeaderSuccessUrl (resData, imgSrcStr) {
+                this.formValidate.icon = resData
+                this.imgSrc = this.getStaticPath(resData)
+            },
+            // 资格证照
+            upladTeachCertImgsSuccess (fileList) {
+                console.log(fileList)
+                this.formValidate.teachCertImgs = fileList.join(',')
+            },
+            // 身份证正面照
+            upladIdcardImgs1Success (fileList) {
+                this.idcard1Imgs = fileList
+            },
+            // 身份证反面照
+            upladIdcardImgs2Success (fileList) {
+                this.idcard2Imgs = fileList
+            },
+            cancle () {
+                this.$emit('cancel', 'edit')
+            },
+            getOrganization () {
+                let opt = {
+                    ajaxSuccess: res => {
+                        this.organization = res.data
+                    },
+                    ajaxParams: {
+                        url: api.organization.path,
+                    },
+                }
+                this.ajax(opt)
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm (formName) {
+//                if(formName.textbookVersionList[0].textbookVersionId){
+//                    formName.textbookVersionId = formName.textbookVersionList[0].textbookVersionId
+//                }
+
+                let flag = false
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        flag = true
+                    }
+                })
+                if (flag) {
+                    if (this.idcard1Imgs.length || this.idcard2Imgs.length) {
+                        if (!(this.idcard1Imgs.length && this.idcard2Imgs.length)) {
+                            this.errorMess('身份证正反面照片必须上传完整')
+                            return false
+                        } else {
+                            this.formValidate.idcardImgs = this.idcard1Imgs[0] + ',' + this.idcard2Imgs[0]
+                        }
+                    }
+                }
+                return flag
+            },
+            /*
+            * 点击提交按钮 监听是否提交数据
+            * @param isLoadingFun boolean  form表单验证是否通过
+            * */
+            listenSubEvent (isLoadingFun) {
+                let isSubmit = this.submitForm('formValidate')
+                console.log(this.formValidate.textbookVersionList)
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    }
+                    isLoadingFun(true)
+                    let data = this.getFormData(this.formValidate)
+                    if (data.times) {
+                        data.times = this.conductDate(data.times, 'yyyy-MM-dd')
+                    }
+                    if (data.birth) {
+                        data.birth = this.conductDate(data.birth, 'yyyy-MM-dd')
+                    }
+                    if (typeof (this.formValidate.types) == 'Number') {
+                        this.formValidate.types = '"' + this.formValidate.types + '"'
+                    }
+                    if (typeof (this.formValidate.sex) == 'Number') {
+                        this.formValidate.sex = '"' + this.formValidate.sex + '"'
+                    }
+                    console.log(this.formValidate.types)
+                    let opt = {
+                        type: 'edit',
+
+                        errorTitle: '修改失败!',
+                        ajaxSuccess: res => this.$emit('edit', 'edit', '修改成功!'),
+                        ajaxError: 'ajaxError',
+                        ajaxParams: {
+                            jsonString: true,
+                            url: api.modify.path,
+                            method: api.modify.method,
+                            data,
+                        },
+                    }
+                    this.ajax(opt, isLoadingFun)
+                }
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData (data) {
+                let myData = Util._.defaultsDeep({}, data)
+                return myData
+            },
+            getStaticPath (path) {
+                return path ? this.$store.getters['app/envs']('resourceHttp') + path : ''
+            },
+        },
+        components: {
+            upHeader,
+            upLoadPhotoWell,
+        },
+    }
+</script>
+<style lang="scss">
+  .cuta_content {
+    position: relative;
+    .el-form .el-input {
+      width: 300px;
+    }
+    .head-box {
+      width: 170px;
+      height: 190px;
+      position: absolute;
+      right: 100px;
+      top: 50px;
+    }
+    p {
+      font-size: 16px;
+      line-height: 50px;
+    }
+  }
+</style>

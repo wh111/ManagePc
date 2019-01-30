@@ -1,0 +1,154 @@
+<template>
+    <div class="cggs-content">
+        <img class="img" v-if="formValidate.icon" :src="resourceHttp + formValidate.icon" alt="" width="260" height="300">
+        <el-form ref="formValidate" :model="formValidate" label-width="120px">
+            <el-form-item label="商品标题：">
+                {{formValidate.title}}
+            </el-form-item>
+            <el-form-item label="商品副标题：">
+                {{formValidate.subtitle}}
+            </el-form-item>
+            <el-form-item label="出版社：">
+                {{formValidate.press}}
+            </el-form-item>
+            <el-form-item label="商品编号：">
+                {{formValidate.no}}
+            </el-form-item>
+            <el-form-item label="价格：">
+                {{formValidate.originalPrice | money}}
+            </el-form-item>
+            <el-form-item label="销量：">
+                {{formValidate.sales}}
+            </el-form-item>
+            <!-- <el-form-item label="评价：">
+                {{formValidate.subtitle}}
+            </el-form-item> -->
+            <el-form-item label="规格：">
+                {{formValidate.spec}}
+            </el-form-item>
+            <el-form-item>
+                <el-button size="small" type="primary" @click="show">查看评价</el-button>
+            </el-form-item>
+            <el-form-item label="商品图片：">
+                <div class="img-wrap" v-if="formValidate.imgs">
+                    <img v-for="(item,index) in formValidate.imgs" :key="index" :src="resourceHttp + item" alt="" width="100" height="120">
+                </div>
+                <span v-else>无商品图片</span>
+            </el-form-item>
+            <el-form-item label="商品介绍：">
+                <el-input disabled size="small" :rows="4" type="textarea" v-model="formValidate.remark"></el-input>
+            </el-form-item>
+            <el-form-item label="商品内容：">
+                <el-input disabled size="small" :rows="4" type="textarea" v-model="formValidate.content"></el-input>
+            </el-form-item>
+            <el-form-item label="商品目标：">
+                <el-input disabled size="small" :rows="4" type="textarea" v-model="formValidate.target"></el-input>
+            </el-form-item>
+            <el-form-item label="商品优势：">
+                <el-input disabled size="small" :rows="4" type="textarea" v-model="formValidate.advantage"></el-input>
+            </el-form-item>
+        </el-form>
+
+        <audit-process v-if="~[0,2].indexOf(formValidate.status)" :id="formValidate.id"></audit-process>
+
+        <!--查看评论-->
+        <Modal :mask-closable="false" width="1000" v-model="showModal" title="添加商品" class-name="vertical-center-modal">
+            <modal-header slot="header" :content="showId"></modal-header>
+            <show v-if="showModal" @cancel="cancel" :operaility-data="formValidate"></show>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
+</template>
+<script>
+    import show from './goodDetail'
+    import api from './api'
+    import auditProcess from './components/auditProcess'
+
+    let Util = null;
+    export default {
+        props: ['operailityData'],
+        data() {
+            return {
+                resourceHttp: '',
+                formValidate: {
+                    id: '',
+                    status: ''
+                },
+                showId: {
+                    id: 'show',
+                    title: '评价列表'
+                }
+
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                this.resourceHttp = this.$store.getters['app/envs']('resourceHttp');
+                this.ajax({
+                    ajaxSuccess: this.getData,
+                    ajaxParams: {
+                        url: api.get.path + '?id=' + this.operailityData.id,
+                        method: api.get.method
+                    }
+                })
+            },
+            getData(res) {
+                this.formValidate = res.data;
+                if (this.formValidate.imgs) {
+                    this.formValidate.imgs = this.formValidate.imgs.split(',');
+                }
+            },
+            show() {
+                this.openModel("show");
+            },
+            /*
+             * 监听子组件通讯的方法
+             * 作用:根据不同的参数关闭对应的模态
+             * @param targer string example:"add"、"edit"
+             * */
+            cancel(targer) {
+                this[targer + 'Modal'] = false;
+            },
+            /*
+             * 打开指定的模态窗体
+             * @param options string 当前指定的模态:"add"、"edit"
+             * */
+            openModel(options) {
+                this[options + 'Modal'] = true;
+            }
+        },
+        components: {
+            show, auditProcess
+        }
+    }
+</script>
+
+<style lang="scss">
+    .cggs-content {
+        .img-wrap {
+            display: inline-block;
+            height: 150px;
+            img{
+                margin-right: 20px;
+            }
+        }
+        .img {
+            position: absolute;
+            right: 28px;
+            top: 64px;
+        }
+        .el-input {
+            width: 60%;
+        }
+        .el-form-item {
+            img {
+                width: 100px;
+            }
+        }
+    }
+
+</style>

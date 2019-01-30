@@ -1,0 +1,515 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <div>
+            <el-form :model="formValidate" :rules="rules" ref="formValidate" class="demo-ruleForm search-from"
+                     style="padding-left: 10px"
+                     inline>
+                <el-row>
+                    <el-col>
+                        <el-form-item prop="name" label="教师姓名：">
+                            <el-input style="width: 195px" size="small" v-model="formValidate.name"
+                                      placeholder="教师姓名">
+                                <el-button @click="searchEvent" slot="append" icon="el-icon-search"></el-button>
+                            </el-input>
+                        </el-form-item>
+                      <el-button class="tableMakeItem" :icon="searchMore ? 'arrow-down' : 'arrow-up'"
+                                 style="margin-top: 1px" @click="showSearchMore">筛选
+                        </el-button>
+                    </el-col>
+                </el-row>
+                <div v-if="searchMore" ref="searchMore" style="text-align: left">
+                    <el-form-item label="账号：" prop="account">
+                        <el-input style="width: 195px" v-model="formValidate.account"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号：" prop="mobile">
+                        <el-input style="width: 195px" v-model="formValidate.mobile"></el-input>
+                    </el-form-item>
+                    <el-form-item label="所属机构：" prop="orgId">
+                        <el-select v-model="formValidate.orgId" placeholder="请选择">
+                            <el-option label="全部" value=""></el-option>
+                            <el-option v-for="(item,index) in organization" :key="index" :label="item.title"
+                                       :value="item.id"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="状态：" prop="accountStatus">
+                        <el-select filterable v-model="formValidate.accountStatus" placeholder="请选择">
+                            <el-option label="全部" value=""></el-option>
+                            <el-option label="正常" value="0"></el-option>
+                            <el-option label="冻结" value="1"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="学科：" prop="subject">
+                        <el-select v-model="formValidate.subject" placeholder="请选择">
+                            <el-option label="全部" value=""></el-option>
+                            <el-option v-for="(item,index) in subjectList" :key="index" :label="item.value"
+                                       :value="item.code"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="资格种类：" prop="types">
+                        <el-select filterable v-model="formValidate.types" placeholder="请选择">
+                            <el-option label="全部" value=""></el-option>
+                            <el-option label="小学教师" value="0"></el-option>
+                            <el-option label="初中老师" value="1"></el-option>
+                            <el-option label="高中老师" value="2"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="实名认证：" prop="realStatus">
+                        <el-select filterable v-model="formValidate.realStatus" placeholder="请选择">
+                            <el-option label="全部" value=""></el-option>
+                            <el-option label="未实名" value="0"></el-option>
+                            <el-option label="实名通过" value="2"></el-option>
+                            <el-option label="实名驳回" value="3"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="资格证编号：" prop="teachCertNo">
+                        <el-input style="width: 195px" v-model="formValidate.teachCertNo"></el-input>
+                    </el-form-item>
+                    <el-button type="success" @click="searchEvent">查询</el-button>
+                </div>
+                <el-col :span="14" style="margin-top:20px;margin-left: -14px">
+                  <el-button size="small" class="greenButton" @click="add">新增</el-button>
+                    <el-button size="small" class="orangeButton" @click="application">申请列表</el-button>
+                    <el-button size="small" class="blueButton" @click="importTeachers">导入教师</el-button>
+                    <span class="cutl_tip"><i>!</i>导入老师请先下载模板</span>
+                </el-col>
+            </el-form>
+        </div>
+
+        <div id="myTable" ref="myTable">
+            <el-table sortable="custom" @sort-change="sortChange" align="center" :context="self" :height="dynamicHt"
+                      :data="tableData" tooltip-effect="dark" style="width: 100%"
+                      @selection-change="handleSelectionChange">
+                <!-- <el-table-column type="selection" width="30"></el-table-column> -->
+                <el-table-column prop="index" label="序号" width="70px" show-overflow-tooltip></el-table-column>
+                <el-table-column prop="name" label="姓名">
+                </el-table-column>
+                <el-table-column prop="sex" label="性别" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.sex | sex}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="types" label="资格种类" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.types | teachTypes}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="account" label="账号" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="subject" label="任教学科" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.subject | subject }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="orgName" label="所属机构" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="teachCertNo" label="资格证编号" show-overflow-tooltip align="center">
+                </el-table-column>
+                <el-table-column prop="realStatus" label="是否认证" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.realStatus == 0"><i class="el-icon-error"></i></span>
+                        <span v-else><i class="el-icon-success"></i></span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="wechat" label="微信状态" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.wechat == null">未绑定</span>
+                        <span v-else>{{scope.row.wechat}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="accountStatus" label="账号状态" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.accountStatus | accountStatus}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="240">
+                    <template slot-scope="scope">
+                      <el-button class="tableMakeItem" size="small" @click="show(scope.row)">查看</el-button>
+                      <el-button class="tableMakeItem" :disabled="scope.row.accountStatus == 1" size="small"
+                                 @click="edit(scope.row)">修改
+                      </el-button>
+                      <el-button class="tableMakeItem" v-if="scope.row.accountStatus == '0'" size="small"
+                                   @click="enable(scope.row,'1')">冻结
+                        </el-button>
+                      <el-button class="tableMakeItem" v-else size="small" @click="enable(scope.row,'0')">恢复
+                      </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div style="margin: 10px 50px 10px 0;">
+                <div style="float: right;">
+                    <el-pagination @size-change="changePageSize" @current-change="changePage"
+                                   :current-page.sync="myPages.currentPage" :page-size="myPages.pageSize"
+                                   layout="total,prev, pager, next, jumper" :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+        <!--导入弹窗-->
+        <Modal :mask-closable="false" close-on-click-modal="false" height="200" v-model="toChannelModal" title="对话框标题"
+               class-name="vertical-center-modal" :width="800">
+            <modal-header slot="header" :content="toChannelId"></modal-header>
+            <toChannel v-if="toChannelModal" @toChannel="subCallback" @cancel="cancel"
+                       :operaility-data="operailityData"></toChannel>
+            <div slot="footer"></div>
+        </Modal>
+        <!-- 模态框 增加（add） -->
+        <Modal :mask-closable="false" v-model="addModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :width="840">
+            <modal-header slot="header" :content="headerContent.addId"></modal-header>
+            <add v-if="addModal" @cancel="cancel" @add="subCallback"></add>
+            <div slot="footer"></div>
+        </Modal>
+        <!-- 模态框 编辑（edit） -->
+        <Modal :mask-closable="false" v-model="editModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :width="840">
+            <modal-header slot="header" :content="headerContent.editId"></modal-header>
+            <edit v-if="editModal" @cancel="cancel" @edit="subCallback" :operaility-data="operailityData"></edit>
+            <div slot="footer"></div>
+        </Modal>
+        <!-- 模态框 查看（view） -->
+        <Modal :mask-closable="false" v-model="showModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :loading="true"
+               :width="840">
+            <modal-header slot="header" :parent="self" :content="headerContent.showId"></modal-header>
+            <show v-if="showModal" @cancel="cancel" :operaility-data="operailityData"></show>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
+</template>
+<script>
+  import add from './teacherManage_add.vue'
+  import show from '../../../components/common/users/teacherDetail.vue'
+  import application from './teacherApplication_list.vue'
+  import edit from './teacherManage_edit.vue'
+  import api from './api'
+  import toChannel from './teacher_toChannel.vue'
+  import { list as rules } from './rules'
+
+  let Util = null
+  export default {
+    data () {
+      return {
+        rules,
+        //* 表格 *//
+        self: this,
+        totalCount: 0,
+        subjectList: [],
+        organization: [],
+        loading: false,
+        dynamicHt: 100, // 表格高度
+        multipleSelection: [],
+        operailityData: {},
+        searchMore: false,
+        contentAll: 2313242,
+        tableData: [],
+        formValidate: {
+          account: '', //账户
+          mobile: '', //手机号
+          teachCertNo: '', //教师资格证编号
+          orgId: '', //所属机构
+          subject: '', //任教学科
+          realStatus: '', //是否实名认证
+          accountStatus: '', //账户状态
+          name: '', //老师姓名
+          types: ''
+        },
+        toChannelId: {
+          id: 'toChannelId',
+          title: '导入'
+        },
+        toChannelModal: false,
+        headerContent: {
+          addId: {id: 'addId', title: '新增教师'},
+          editId: {id: 'editId', title: '修改教师信息'},
+          showId: {id: 'showId', title: '查看教师信息'}
+        }
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      //初始化函数
+      init () {
+        Util = this.$util
+        this.subjectList = this.$store.getters['app/gradeMap'](12)
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {
+            curPage: 1,
+            pageSize: Util.pageInitPrams.pageSize
+          }
+        }
+        this.setTableData()
+        this.getOrganization()
+      },
+      getOrganization () {
+        let opt = {
+          ajaxSuccess: res => {
+            this.organization = res.data
+          },
+          ajaxParams: {
+            url: api.organization.path
+          }
+        }
+        this.ajax(opt)
+      },
+      /************************** 表格 ************************/
+      /*
+      * checkbox 选择后触发事件
+      * @param val Array 存在所有的选择每一个行数据
+      */
+      handleSelectionChange (val) {
+        this.multipleSelection = val
+      },
+      //修改
+      edit (item) {
+        this.operailityData = item
+        this.openModel('edit')
+      },
+      application () {
+        Util.dialog({
+          title: '申请列表',
+          width: '1000px', //可选项tiny/small/large/full, 对应el-dialog的size属性
+          component: application,
+          content: {
+            id: 'showId',
+            title: '申请列表'
+          },
+          data: {},
+          close: () => {
+            //关闭后触发
+            console.log('dialog is closed')
+          },
+          confirm: result => {
+            //显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      /*
+      * 设置表格数据
+      * @param isLoading Boolean 是否加载
+      */
+      setTableData (isLoading) {
+        Object.assign(this.queryQptions.params, this.formValidate)
+        this.ajax(
+          {
+            ajaxSuccess: 'listDataSuccess',
+            ajaxParams: this.queryQptions
+          },
+          isLoading
+        )
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = this.addIndex(res.data.dataList || [])
+      },
+      // 高级搜索按钮展开搜索表单并重新计算表格高度
+      showSearchMore () {
+        this.searchMore = !this.searchMore
+        this.$nextTick(function () {
+          this.setTableDynHeight()
+        })
+      },
+      //新增
+      add () {
+        this.openModel('add')
+      },
+      //查看
+      show (item) {
+        this.operailityData = item
+        this.openModel('show')
+      },
+
+      //搜索查询
+      searchEvent () {
+        let isSubmit = this.handleSubmit('formValidate')
+        if (isSubmit) {
+          this.setTableData()
+        }
+      },
+      /*
+      * 列表查询方法
+      * @param string 查询from的id
+      * */
+      handleSubmit (name) {
+        let flag = false
+        this.$refs[name].validate(valid => {
+          if (valid) {
+            flag = true
+          } else {
+            this.errorMess('表单验证失败!')
+          }
+        })
+        return flag
+      },
+      //数据排序
+      sortChange (row) {
+        console.log(row)
+      },
+      //状态操作
+      enable (item, status) {
+        //冻结   解冻
+        if (status == '1') {
+          Util.todoConfirm({
+            title: '确定冻结该用户吗？',
+            content: {
+              id: 'todoId',
+              title: '冻结该用户'
+            },
+            data: {
+              data: {
+                ids: Util.getStrByArr(
+                  item ? [item] : this.multipleSelection,
+                  'id'
+                ),
+                accountStatus: '1'
+              },
+              api: api.enable,
+              msg: '冻结'
+            },
+            close: () => {
+              //关闭后触发
+              this.subCallback()
+            },
+            confirm: result => {
+            }
+          })
+        } else {
+          Util.todoConfirm({
+            title: '确定恢复该用户吗？',
+            content: {
+              id: 'todoId',
+              title: '恢复该用户'
+            },
+            data: {
+              data: {
+                ids: Util.getStrByArr(
+                  item ? [item] : this.multipleSelection,
+                  'id'
+                ),
+                accountStatus: '0'
+              },
+              api: api.enable,
+              msg: '恢复'
+            },
+            close: () => {
+              //关闭后触发
+              this.subCallback()
+            },
+            confirm: result => {
+            }
+          })
+        }
+      },
+      importTeachers () {
+        this.openModel('toChannel')
+      },
+      //设置表格及分页的位置
+      setTableDynHeight () {
+        let content = this.$refs.content
+        let parHt = content.parentNode.offsetHeight
+        let myTable = this.$refs.myTable
+        let paginationHt = 94
+        this.dynamicHt = parHt - myTable.offsetTop - paginationHt
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:根据不同的参数关闭对应的模态
+      * @param targer string example:"add"、"edit"
+      * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+      * 打开指定的模态窗体
+      * @param options string 当前指定的模态:"add"、"edit"
+      * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:根据不同的参数关闭对应的模态
+      * @param targer string example:"add"、"edit"
+      * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+
+      /*
+      * 监听子组件通讯的方法
+      * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+      * @param targer string example:"add"、"edit"
+      * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+      * 例如:errorTitle、errorTitle
+      *addMessTitle:{
+      *    type:'add',
+      *    successTitle:'添加成功!',
+      *    errorTitle:'添加失败!',
+      *    ajaxSuccess:'ajaxSuccess',
+      *    ajaxError:'ajaxError',
+      *    ajaxParams:{
+      *      url:'/role/add',
+      *      method:'post'
+      *    }
+      *    }
+      * @param udata boolean 默认false  是否不需要刷新当前表格数据
+      * */
+      subCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.setTableData()
+        }
+      },
+      /*
+      * 打开指定的模态窗体
+      * @param options string 当前指定的模态:"add"、"edit"
+      * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      }
+    },
+    mounted () {
+      //页面dom稳定后调用
+      this.$nextTick(function () {
+        //初始表格高度及分页位置
+        this.setTableDynHeight()
+        //为窗体绑定改变大小事件
+        let Event = Util.events
+        Event.addHandler(window, 'resize', this.setTableDynHeight)
+      })
+    },
+    components: {
+      show,
+      application,
+      add,
+      edit,
+      toChannel
+    }
+  }
+</script>
+
+<style lang="scss">
+    .cutl_tip {
+        margin-left: 20px;
+        i {
+            background: #e0b9b6;
+            border-radius: 50%;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            color: #000000;
+            text-align: center;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+    }
+</style>
+

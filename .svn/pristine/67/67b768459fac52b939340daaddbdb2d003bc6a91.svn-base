@@ -1,0 +1,67 @@
+<!--
+****--@file     taskPublish
+****--@date     2017/12/5 下午3:06
+****--@author   jhd
+****--@describe   任务管理
+-->
+<template>
+  <div class="moudle-wrap cttbulish modal clearfix taskPublish" id="content" ref="content">
+        <el-tabs v-model="activeName">
+            <el-tab-pane label="平台发布" name="first">
+                <platform-release :contentHeight="contentHeight" v-if="activeName == 'first'"></platform-release>
+            </el-tab-pane>
+            <el-tab-pane label="教师申请" name="second">
+                <teacher-release :contentHeight="contentHeight" v-if="activeName == 'second'"></teacher-release>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</template>
+<script>
+    import platformRelease from './taskPublish_list.vue'
+    import teacherRelease from './taskApply_list.vue'
+
+    let Util = null
+    export default {
+        data() {
+            return {
+                activeName: 'first',
+                parHt: '',
+                contentHeight: ''
+            };
+        },
+        created() {
+            Util = this.$util;
+        },
+        methods: {
+//      //设置表格及分页的位置
+            setTableDynHeight() {
+                this.contentHeight = this.$refs.content.parentNode.offsetHeight;
+            }
+        },
+        mounted() {
+            //页面dom稳定后调用
+            this.$nextTick(function () {
+                //初始表格高度及分页位置
+                this.setTableDynHeight();
+                //为窗体绑定改变大小事件
+                let Event = Util.events;
+                Event.addHandler(window, "resize", this.setTableDynHeight);
+            })
+        },
+        components: {
+            platformRelease,
+            teacherRelease
+        }
+    };
+</script>
+<style lang="scss">
+    .cttbulish {
+        height: 100%;
+    }
+
+    .taskPublish {
+      .el-tabs__header {
+        margin: 0 0 5px !important;
+      }
+    }
+</style>

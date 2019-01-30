@@ -1,0 +1,376 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <el-col>
+            <div>
+                <el-form :rules="rules" ref="formValidate" :model="formValidate" class="demo-ruleForm" inline
+                         label-width="80px">
+                    <el-row class="search-from">
+                        <el-form-item label="纠错次数" prop="sortBy">
+                            <el-button class="sort-by-left" icon="el-icon-sort-up" @click="sort('counts','ASC')"></el-button>
+                            <el-button class="sort-by-right" icon="el-icon-sort-down" @click="sort('counts','DESC')"></el-button>
+                        </el-form-item>
+                        <el-form-item label="纠错时间" prop="order">
+                            <el-button class="sort-by-left" icon="el-icon-sort-up" @click="sort('lastTime','ASC')"></el-button>
+                            <el-button class="sort-by-right" icon="el-icon-sort-down" @click="sort('lastTime','DESC')"></el-button>
+                        </el-form-item>
+                        <el-form-item label="科目" prop="subject">
+                            <el-select size="small" v-model="formValidate.subject" placeholder="">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option v-for="(item,index) in subjectList" :key="item.code" :label="item.value"
+                                           :value="item.code"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="状态" prop="status">
+                            <el-select size="small" v-model="formValidate.status" placeholder="">
+                                <el-option label="全部" value=""></el-option>
+                                <el-option label="未处理" value="0"></el-option>
+                                <el-option label="已处理" value="1"></el-option>
+                                <el-option label="已冻结" value="2"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="题目编号" prop="no">
+                            <el-input style="width: 195px" size="small" v-model="formValidate.questionId"></el-input>
+                        </el-form-item>
+                        <el-button style="margin-left: 40px" class="search-btn" size="small" type="primary"
+                                   @click="searchEvent">搜索
+                        </el-button>
+
+
+                    </el-row>
+                    <el-col :span="14" style="margin-bottom:20px">
+                        <el-button size="small" type="danger" @click="enable">批量冻结</el-button>
+                    </el-col>
+                </el-form>
+            </div>
+
+            <div id="myTable" ref="myTable">
+                <el-table
+                        align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                        style="width: 100%" @selection-change="handleSelectionChange"
+                >
+                    <el-table-column type="selection" width="30"></el-table-column>
+                    <el-table-column prop="index" label="序号" width="70px" show-overflow-tooltip></el-table-column>
+                    <el-table-column
+                            prop="subject"
+                            label="科目"
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            {{ scope.row.subject | subject }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                      prop="no"
+                      label="题目编号"
+                      show-overflow-tooltip
+                      align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="lastTime"
+                            label="纠错日期"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            {{ scope.row.lastTime | formatDate }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="title"
+                            label="题目详情"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="counts"
+                            label="纠错次数"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="status"
+                            label="状态"
+                    >
+                        <template slot-scope="scope">
+                            {{ scope.row.status | outofQuestionStatus }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" width="210">
+                        <template slot-scope="scope">
+                            <el-button size="small" type="success" @click="show(scope.row)">查看</el-button>
+                            <el-button v-if="scope.row.status != '2'" size="small" type="danger" :disabled="!scope.row.status"
+                                       @click="enable(scope.row)">冻结
+                            </el-button>
+                            <el-button v-else size="small" type="danger" @click="able(scope.row)">解冻</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="margin: 10px 50px 10px 0;">
+                    <div style="float: right;">
+                        <el-pagination
+                                @size-change="changePageSize"
+                                @current-change="changePage"
+                                :current-page.sync="myPages.currentPage"
+                                :page-size="myPages.pageSize"
+                                layout="total,prev, pager, next, jumper"
+                                :total="totalCount">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
+            <!--查看弹窗-->
+            <Modal
+                    :mask-closable="false"
+                    width="1000"
+                    v-model="showModal"
+                    title="查看试题"
+                    class-name="vertical-center-modal"
+                    :loading="loading">
+                <modal-header slot="header" :content="showId"></modal-header>
+                <show v-if="showModal" @cancel="cancel" @show="subCallback" :operaility-data="operailityData"></show>
+                <div slot="footer"></div>
+            </Modal>
+        </el-col>
+    </div>
+</template>
+<script>
+    import show from '../errorFeedback/feedback.vue'
+    import api from '../errorFeedback/api'
+    import {wrongFeedbackList as rules} from '../rules'
+
+    let Util = null;
+    export default {
+        data() {
+            return {
+                rules,
+                //* 表格 *//
+                self: this,
+                totalCount: 0,
+                loading: false,
+                subjectList: [],
+                dynamicHt: 100, // 表格高度
+                multipleSelection: [],
+                operailityData: {},
+                contentAll: 2313242,
+                tableData: [],
+                formValidate: {
+                    questionId: '',//题型编号
+                    status: '',//状态
+                    subject: '',//科目
+                    sortBy: '',//排序类型
+                    order: ''//升序/降序
+                },
+                showId: {
+                    id: 'show',
+                    title: '查看'
+                }
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            //初始化函数
+            init() {
+                Util = this.$util;
+                this.subjectList = this.$store.getters['app/gradeMap'](12)
+                this.myPages = Util.pageInitPrams;
+                this.queryQptions = {
+                    url: api.list.path + '?types=0',
+                    params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize}
+                }
+                this.setTableData()
+            },
+            /************************** 表格 ************************/
+            /*
+            * checkbox 选择后触发事件
+            * @param val Array 存在所有的选择每一个行数据
+            */
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            /**
+             * 排序
+             * **/
+            sort(sortBy, order) {
+                this.formValidate.sortBy = sortBy;
+                this.formValidate.order = order;
+                this.setTableData()
+            },
+            /*
+             * 设置表格数据
+             * @param isLoading Boolean 是否加载
+             */
+            setTableData(isLoading) {
+                Object.assign(this.queryQptions.params, this.formValidate);
+                this.ajax({
+                    ajaxSuccess: 'listDataSuccess',
+                    ajaxParams: this.queryQptions
+                }, isLoading)
+            },
+            // 数据请求成功回调
+            listDataSuccess(res, m, loading) {
+                this.totalCount = res.data.totalCount || 0;
+                this.tableData = this.addIndex(res.data.dataList || []);
+            },
+            //查看
+            show(item) {
+                this.operailityData = item;
+                this.operailityData.types = '0';
+                this.openModel('show');
+            },
+
+            //搜索查询
+            searchEvent() {
+                let isSubmit = this.handleSubmit('formValidate');
+                if(isSubmit) {
+                    this.setTableData()
+                }
+            },
+            /*
+           * 列表查询方法
+           * @param string 查询from的id
+           * */
+            handleSubmit(name) {
+                let flag = false
+                this.$refs[name].validate((valid) => {
+                    if(valid) {
+                        flag = true;
+                    } else {
+                        this.errorMess('表单验证失败!');
+                    }
+                })
+                return flag
+            },
+            //批量删除
+            enable(item) {
+                Util.todoConfirm({
+                    title: '确定冻结选中的超纲反馈信息吗？',
+                    content: {id: 'todoId', title: '冻结'},
+                    data: {
+                        data: {
+                            questionIds: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id'),
+                            enable: '1',
+                            types: '0'
+                        },
+                        api: api.enable,
+                        msg: '冻结'
+                    },
+                    close: () => {//关闭后触发
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    }
+                })
+            },
+            able(item) {
+                Util.todoConfirm({
+                    title: '确定解冻选中的超纲反馈信息吗？',
+                    content: {id: 'todoId', title: '解冻'},
+                    data: {
+                        data: {
+                            questionIds: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id'),
+                            enable: '0',
+                            types: '0'
+                        },
+                        api: api.enable,
+                        msg: '解冻'
+                    },
+                    close: () => {//关闭后触发
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    }
+                })
+            },
+            //设置表格及分页的位置
+            setTableDynHeight() {
+                let content = this.$refs.content;
+                let parHt = content.parentNode.offsetHeight;
+                let myTable = this.$refs.myTable;
+                let paginationHt = 105;
+                this.dynamicHt = parHt - myTable.offsetTop - paginationHt;
+                this.$refs.myTable.style.height = this.dynamicHt + 'px';
+                // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+            },
+            /*
+             * 监听子组件通讯的方法
+             * 作用:根据不同的参数关闭对应的模态
+             * @param targer string example:"add"、"edit"
+             * */
+            cancel(targer) {
+                this[targer + 'Modal'] = false;
+            },
+            /*
+             * 监听子组件通讯的方法
+             * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+             * @param targer string example:"add"、"edit"
+             * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+             * 例如:errorTitle、errorTitle
+             *addMessTitle:{
+             *    type:'add',
+             *    successTitle:'添加成功!',
+             *    errorTitle:'添加失败!',
+             *    ajaxSuccess:'ajaxSuccess',
+             *    ajaxError:'ajaxError',
+             *    ajaxParams:{
+             *      url:'/role/add',
+             *      method:'post'
+             *    }
+             *    }
+             * @param udata boolean 默认false  是否不需要刷新当前表格数据
+             * */
+            subCallback(target, title, updata) {
+                this.cancel(target);
+                if(title) {
+                    this.successMess(title);
+                }
+                if(!updata) {
+                    this.setTableData();
+                }
+            },
+            /*
+             * 打开指定的模态窗体
+             * @param options string 当前指定的模态:"add"、"edit"
+             * */
+            openModel(options) {
+                this[options + 'Modal'] = true;
+            },
+        },
+        mounted() {
+            //页面dom稳定后调用
+            this.$nextTick(function() {
+                //初始表格高度及分页位置
+                this.setTableDynHeight();
+                //为窗体绑定改变大小事件
+                let Event = Util.events;
+                Event.addHandler(window, "resize", this.setTableDynHeight);
+            })
+        },
+        components: {
+            show
+        }
+    }
+</script>
+<style lang="scss">
+    .sort-by-left {
+        padding: 10px 0px;
+        i{
+            margin-right: 6px;
+        }
+
+    }
+    .sort-by-right {
+        padding: 10px 0px;
+        margin-left: 0px!important;
+        i{
+            margin-left: 6px;
+        }
+    }
+</style>
+
+
+

@@ -1,0 +1,104 @@
+<template>
+  <div>
+    <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="140px">
+      <el-form-item label="期限：" prop="deadline">
+        <el-select size="small" v-model="formValidate.deadline" placeholder="请选择">
+          <el-option label="一个月" value="1"></el-option>
+          <el-option label="三个月" value="3"></el-option>
+          <el-option label="六个月" value="6"></el-option>
+          <el-option label="十二个月" value="12"></el-option>
+        </el-select>
+      </el-form-item>
+      <p style="text-align: center">
+        <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+        <el-button size="small" class="tableMakeItemCancel" type="info" @click="cancel">取消</el-button>
+      </p>
+    </el-form>
+  </div>
+</template>
+<script>
+  /*当前组件必要引入*/
+
+  //当前组件引入全局的util
+  let Util = null;
+  import api from './api'
+  import { addVip as rules } from './rules'
+  export default {
+    props:{
+      value:Object
+    },
+    data() {
+      return {
+        rules,
+        loadBtn: { title: "提交", callParEvent: "listenSubEvent" },
+        formValidate:{
+          deadline:'1',
+          studentId:this.value.id
+        },
+        addMessTitle: {
+          type: "addVip",
+          callback: "close",
+          successTitle: "升级会员成功!",
+          errorTitle: "升级会员失败!",
+          ajaxSuccess: "ajaxSuccess",
+          ajaxError: "ajaxError",
+          ajaxParams: {
+            url: api.addVip.path ,
+            method: api.addVip.method
+          }
+        }
+      }
+    },
+    methods: {
+      //初始化请求列表数据
+      init() {
+        Util = this.$util;
+      },
+      cancel() {
+        this.$emit("confirm");
+      },
+      /*
+        * 点击提交按钮 监听是否验证通过
+        * @param formName string  form表单v-model数据对象名称
+        * @return flag boolean   form表单验证是否通过
+        * */
+      submitForm(formName) {
+        let flag = false;
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            flag = true;
+          }
+        });
+        return flag;
+      },
+      /*
+      * 点击提交按钮 监听是否提交数据
+      * @param isLoadingFun boolean  form表单验证是否通过
+      * */
+      listenSubEvent(isLoadingFun) {
+        let isSubmit = this.submitForm("formValidate");
+        if (isSubmit) {
+          if (!isLoadingFun) isLoadingFun = function() {};
+          isLoadingFun(true);
+          this.addMessTitle.ajaxParams.data = this.getFormData(this.formValidate);
+          console.log(this.addMessTitle)
+          this.ajax(this.addMessTitle, isLoadingFun);
+        }
+      },
+      /*
+      * 获取表单数据
+      * @return string  格式:id=0&name=aa
+      * */
+      getFormData(data) {
+        let myData = Util._.defaultsDeep({}, data);
+        return myData;
+      }
+    },
+    created() {
+      this.init();
+    },
+    mounted() {
+    },
+    components: {}
+  }
+</script>

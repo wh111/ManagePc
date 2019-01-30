@@ -1,0 +1,9 @@
+/* 订单基本布局 */
+.orderMain {
+  width: 100%;
+  overflow: auto;
+  .noDataTips {
+    text-align: center;
+  }
+  .el-table__body-wrapper{overflow: hidden;}
+}

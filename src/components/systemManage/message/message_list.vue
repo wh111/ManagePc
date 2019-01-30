@@ -1,0 +1,290 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+      <el-col class="search-from" style="height: 43px;padding-left: 13px">
+
+
+        <el-select v-model="searchObj.time" placeholder="请选择" @change="setTableData()">
+                <el-option
+                  v-for="item in timeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+            </el-select>
+        </el-col>
+      <el-col>
+        <el-button size="small" class="greenButton" @click="add" style="margin-bottom: 20px">创建</el-button>
+      </el-col>
+        <div id="myTable" ref="myTable">
+            <el-table align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                      style="width: 100%" @selection-change="handleSelectionChange">
+              <el-table-column type="selection" width="50"></el-table-column>
+              <el-table-column align="center" prop="index" label="序号" width="70px"
+                               show-overflow-tooltip></el-table-column>
+                <el-table-column label="标题" prop="title" width="120" show-overflow-tooltip></el-table-column>
+                <el-table-column label="摘要" prop="content" show-overflow-tooltip>
+
+                </el-table-column>
+                <el-table-column label="创建者" align="center" width="120" prop="operator"
+                                 show-overflow-tooltip></el-table-column>
+                <el-table-column label="创建时间" align="center" width="160" prop="createTime" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.createTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="状态" width="100" align="center" prop="status" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.status | msgPublishStatus }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="240">
+                    <template slot-scope="scope">
+                      <el-button size="small" class="tableMakeItem" @click="show(scope.row)">查看</el-button>
+                      <el-button :disabled="scope.row.status === 1" size="small" class="tableMakeItem"
+                                 @click="edit(scope.row)">
+                            编辑
+                        </el-button>
+                      <el-button size="small" class="tableMakeItem" @click="remove(scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div style="margin: 10px 50px 10px 0;">
+              <el-button size="small" @click="remove('')" class="deleteButton">批量删除</el-button>
+                <div style="float: right;">
+                    <el-pagination
+                            @size-change="changePageSize"
+                            @current-change="changePage"
+                            :current-page.sync="myPages.currentPage"
+                            :page-size="myPages.pageSize"
+                            layout="total,prev, pager, next, jumper"
+                            :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    let Util = null
+    import api from './api'
+    import add from './message_add'
+    import edit from './message_edit'
+    import show from './message_show'
+
+    export default {
+        data () {
+            return {
+                //* 表格 *//
+                self: this,
+                totalCount: 0,
+                // loading: false,
+                dynamicHt: 100, // 表格高度
+                multipleSelection: [],
+                operailityData: {},
+                tableData: [],
+                searchObj: {
+                    title: '',
+                    time: '',
+                },
+                timeOptions: [
+                    {
+                        label: '全部',
+                        value: ' ',
+                    },
+                    {
+                        label: '五天内',
+                        value: '1',
+                    },
+                    {
+                        label: '一周内',
+                        value: '2',
+                    },
+                    {
+                        label: '一个月内',
+                        value: '3',
+                    },
+                    {
+                        label: '一年内',
+                        value: '4',
+                    }],
+            }
+        },
+        created () {
+            this.init()
+        },
+        methods: {
+            init () {//初始化函数
+                Util = this.$util
+                this.myPages = Util.pageInitPrams
+                this.queryQptions = {
+                    url: api.list.path,
+                    params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize},
+                }
+                this.setTableData()
+            },
+            /*
+            * checkbox 选择后触发事件
+            * @param val Array 存在所有的选择每一个行数据
+            */
+            handleSelectionChange (val) {
+                this.multipleSelection = val
+            },
+            show (item) {//查看消息详情
+                Util.dialog({
+                    title: '查看系统消息',
+                    width: '1000px',
+                    content: {id: 'showId', title: '查看系统消息'},
+                    component: show,
+                    data: {operailityData: item},
+                    close: () => {
+                    },
+                    confirm: (result) => {
+                    },
+                })
+            },
+            edit (item) {
+                Util.dialog({
+                    title: '编辑系统消息',
+                    width: '1000px',
+                    content: {id: 'EditId', title: '编辑系统消息'},
+                    component: edit,
+                    data: {operailityData: item},
+                    close: () => {
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    },
+                })
+            },
+            add () {//新建消息
+                Util.dialog({
+                    title: '创建系统消息',
+                    width: '1000px',
+                    content: {id: 'addId', title: '创建系统消息'},
+                    component: add,
+                    close: () => {//关闭后触发
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    },
+                })
+            },
+            /*
+            * 设置表格数据
+            * @param isLoading Boolean 是否加载
+            */
+            setTableData (isLoading) {
+                Object.assign(this.queryQptions.params, this.searchObj)
+                this.ajax({
+                    ajaxSuccess: 'listDataSuccess',
+                    ajaxParams: this.queryQptions,
+                }, isLoading)
+            },
+            // 数据请求成功回调
+            listDataSuccess (res, m, loading) {
+                this.totalCount = res.data.totalCount || 0
+                this.tableData = res.data.dataList || []
+            },
+            //设置表格及分页的位置
+            setTableDynHeight () {
+                let content = this.$refs.content.parentNode.offsetHeight
+                let myTable = this.$refs.myTable.offsetTop
+                let paginationHt = 102
+                this.dynamicHt = content - myTable - paginationHt
+            },
+            remove (item) {//删除
+                if (!(item || this.isSelected())) {
+                    return false
+                }
+                Util.todoConfirm({
+                    title: '确定删除系统消息吗？',
+                    content: {id: 'todoId', title: '删除系统消息'},
+                    data: {
+                        data: {ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id')},
+                        api: api.remove,
+                        msg: '删除',
+                    },
+                    close: () => {//关闭后触发
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    },
+                })
+            },
+            /*
+            * 监听子组件通讯的方法
+            * 作用:根据不同的参数关闭对应的模态
+            * @param targer string example:"add"、"edit"
+            * */
+            cancel (targer) {
+                this[targer + 'Modal'] = false
+            },
+            /*
+            * 监听子组件通讯的方法
+            * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+            * @param targer string example:"add"、"edit"
+            * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+            * 例如:errorTitle、errorTitle
+            *addMessTitle:{
+            *    type:'add',
+            *    successTitle:'添加成功!',
+            *    errorTitle:'添加失败!',
+            *    ajaxSuccess:'ajaxSuccess',
+            *    ajaxError:'ajaxError',
+            *    ajaxParams:{
+            *      url:'/role/add',
+            *      method:'post'
+            *    }
+            *    }
+            * @param udata boolean 默认false  是否不需要刷新当前表格数据
+            * */
+            subCallback (target, title, updata) {
+                target && this.cancel(target)
+                if (title) {
+                    this.successMess(title)
+                }
+                if (!updata) {
+                    this.setTableData()
+                }
+            },
+            /*
+            * 打开指定的模态窗体
+            * @param options string 当前指定的模态:"add"、"edit"
+            * */
+            openModel (options) {
+                this[options + 'Modal'] = true
+            },
+
+            /*
+            * 列表数据只能选择一个
+            * @param isOnly true  是否只选择一个
+            */
+            isSelected (isOnly) {
+                let len = this.multipleSelection.length
+                let flag = true
+                if (len == 0) {
+                    this.showMess('请选择数据!')
+                    flag = false
+                }
+                if (len > 1 && isOnly) {
+                    this.showMess('只能选择一条数据!')
+                    flag = false
+                }
+                return flag
+            },
+        },
+        mounted () {
+            //页面dom稳定后调用
+            this.$nextTick(function () {
+                //初始表格高度及分页位置
+                this.setTableDynHeight()
+                //为窗体绑定改变大小事件
+                let Event = Util.events
+                Event.addHandler(window, 'resize', this.setTableDynHeight)
+            })
+        },
+        components: {
+            show, add, edit,
+        },
+    }
+</script>

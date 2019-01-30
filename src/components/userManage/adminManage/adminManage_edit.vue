@@ -1,0 +1,128 @@
+<template>
+    <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="80px">
+        <el-form-item label="登录账号" prop="account">
+            <el-input size="small" v-model="formValidate.account"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+            <el-input size="small" v-model="formValidate.name"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+            <el-input size="small" v-model="formValidate.mobile" auto-complete="off" :disabled=true></el-input>
+        </el-form-item>
+
+        <el-form-item label="权限" prop="roleId">
+            <el-select size="small" v-model="formValidate.roleId">
+                <template v-for="(item,index) in roleList">
+                    <el-option v-if="item.id > 0" :key="index" :label="item.name" :value="item.id"></el-option>
+                </template>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+            <el-input size="small" type="textarea" v-model="formValidate.remark"></el-input>
+        </el-form-item>
+        <div style="text-align: center">
+            <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+          <el-button size="small" class="tableMakeItemCancel" @click="cancel">取消</el-button>
+        </div>
+    </el-form>
+</template>
+<script>
+    import {add as rules} from './rules'
+    import api from './api'
+
+    let Util = null;
+    export default {
+        props: {
+            value: Object
+        },
+        data() {
+            return {
+                rules,
+                formValidate: {
+                    remark: ''
+                },
+                roleList: [],//权限树
+                loadBtn: {title: '提交', callParEvent: 'listenSubEvent', size: 'small'},
+                //当前组件提交(修改)数据时,ajax处理的 基础信息设置
+                editMessTitle: {
+                    type: "edit",
+                    callback: "close",
+                    successTitle: "修改成功!",
+                    errorTitle: "修改失败!",
+                    ajaxSuccess: "ajaxSuccess",
+                    ajaxError: "ajaxError",
+                    ajaxParams: {
+                        url: api.modify.path,
+                        method: api.modify.method
+                    }
+                }
+            }
+        },
+        created() {
+            //给当前组件注入全局util
+            Util = this.$util;
+            this.init()
+        },
+        methods: {
+            /*
+             * 组件初始化入口
+             * */
+            init() {
+                this.ajax({
+                    ajaxSuccess: res => this.roleList = res.data,
+                    ajaxParams: {
+                        url: '/role/all-list',
+                        method: 'get'
+                    }
+                })
+                this.ajax({
+                    ajaxSuccess: res => this.formValidate = res.data,
+                    ajaxParams: {
+                        url: api.get.path + this.value.dialogData.id,
+                        method: api.get.method
+                    }
+                })
+            },
+            cancel() {
+                this.$emit("confirm");
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 点击提交按钮 监听是否提交数据
+            * @param isLoadingFun boolean  form表单验证是否通过
+            * */
+            listenSubEvent(isLoadingFun) {
+                let isSubmit = this.submitForm("formValidate");
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+                    this.editMessTitle.ajaxParams.data = this.getFormData(this.formValidate);
+                    this.ajax(this.editMessTitle, isLoadingFun)
+                }
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = Util._.defaultsDeep({}, data);
+                this.formDate(myData, ['birth'], this.yearMonthData);
+                return myData;
+            }
+        }
+    }
+</script>

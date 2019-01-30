@@ -1,0 +1,107 @@
+<!--
+****--@file     show
+****--@date     2018/1/12 16:55
+****--@author   YC
+****--@describe 题型查看
+-->
+<template>
+    <div>
+        <!-- 组合题 -->
+        <template v-if="showDatas.groups">
+            <mix-show v-if="showDatas.publics" :question="showDatas" :index="index" :hasDo="hasDo"
+                      :showAnswer="showAnswer" :showInput="showInput" :showScore="showScore" @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </mix-show>
+            <group-show v-else :question="showDatas" :index="index" :hasDo="hasDo" :showAnswer="showAnswer"
+                        :showInput="showInput" :showScore="showScore" @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </group-show>
+        </template>
+        <!-- 普通题型 -->
+        <template v-else>
+            <radio-show v-if="showDatas.basicType === 'Radio'" :question="showDatas" :index="index" :hasDo="hasDo"
+                        :showAnswer="showAnswer" :showInput="showInput" :showScore="showScore" @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </radio-show>
+            <checkbox-show v-if="showDatas.basicType === 'Checkbox'" :question="showDatas" :index="index"
+                           :hasDo="hasDo" :showAnswer="showAnswer" :showInput="showInput" :showScore="showScore"
+                           @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </checkbox-show>
+            <judgment-show v-if="showDatas.basicType === 'Judgment'" :question="showDatas" :index="index"
+                           :hasDo="hasDo" :showAnswer="showAnswer" :showInput="showInput" :showScore="showScore"
+                           @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </judgment-show>
+            <input-show v-if="showDatas.basicType === 'Input'" :question="showDatas" :index="index" :hasDo="hasDo"
+                        :showAnswer="showAnswer" :showInput="showInput" :showScore="showScore" @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </input-show>
+            <answer-show v-if="showDatas.basicType === 'Answer'" :question="showDatas" :index="index" :hasDo="hasDo"
+                         :showAnswer="showAnswer" :showInput="showInput" :showScore="showScore" @answer="answer">
+                <slot name="todoBox" slot="todo"></slot>
+                <slot name="answerRight" slot="answerRight"></slot>
+            </answer-show>
+        </template>
+    </div>
+</template>
+<script>
+    /*当前组件必要引入*/
+    import radioShow from './radio_show'
+    import checkboxShow from './checkbox_show'
+    import judgmentShow from './judgment_show'
+    import inputShow from './input_show'
+    import answerShow from './answer_show'
+    import groupShow from './group_show'
+    import mixShow from './mix_show'
+
+    //当前组件引入全局的util
+    let Util = null;
+    export default {
+        props: ['showData', 'index', 'hasDo', 'showAnswer', 'showScore', 'showInput'],
+        data() {
+            return {
+                showDatas: {}
+            }
+        },
+        methods: {
+            //初始化请求列表数据
+            init() {
+                let temp = JSON.stringify(this.showData)
+                var that = this
+              if (temp.indexOf('/static/question/') < 0 || temp.indexOf('/static/') < 0) {
+                temp = temp.replace(/src=\\"([^\"]*?)\\"/gi, function (item) {
+                  item = item.replace('/static/', '');
+                  item = item.split('\\"')[1];
+                    return item = 'src=\\"' + that.getStaticPath(item) + '\\"'
+                })
+              }
+                this.showDatas = JSON.parse(temp)
+            },
+            answer(data) {
+                this.$emit('answer', data)
+            }
+        },
+        created() {
+            this.init();
+        },
+        mounted() {
+        },
+        watch: {
+            showData(val) {
+                this.init()
+                console.log(val)
+            }
+        },
+        components: {
+            radioShow, checkboxShow, judgmentShow, inputShow, answerShow, groupShow, mixShow
+        }
+    }
+
+</script>

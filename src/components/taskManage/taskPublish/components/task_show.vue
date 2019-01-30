@@ -1,0 +1,94 @@
+<template>
+    <div class="cttcs-content">
+        <el-form ref="formValidate" :model="formValidate" label-width="100px">
+            <el-form-item prop="name" label="任务名称：">
+                {{ formValidate.name }}
+            </el-form-item>
+            <el-form-item prop="" label="任务类型：">
+                刷题大赛
+            </el-form-item>
+            <el-form-item prop="" label="发布者：">
+              系统
+            </el-form-item>
+            <el-form-item prop="beginTime" label="开始时间：">
+                {{ formValidate.beginTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+            </el-form-item>
+            <el-form-item prop="endTime" label="结束时间：">
+                {{ formValidate.endTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+            </el-form-item>
+            <el-form-item prop="remark" label="任务描述：">
+                {{ formValidate.remark }}
+            </el-form-item>
+            <el-form-item label="任务内容：">
+                <el-table :data="formValidate.questionList" border height="200" style="width: 100%; margin-top: 20px">
+                    <el-table-column prop="questionId" label="题号" width="100" align="center">
+                    </el-table-column>
+                    <el-table-column prop="title" label="内容" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ scope.row.title | delHtmlTag | sliceText(20) }}
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-form-item>
+            <el-form-item label="积分奖励：">
+                <el-table :data="tableDate" border height="200" style="width: 100%; margin-top: 20px">
+                  <el-table-column align="center" type="index" label="序号" width="70px">
+                    </el-table-column>
+                  <el-table-column prop="studentName" label="学生姓名" width="100" align="center">
+                    </el-table-column>
+                  <el-table-column prop="answerTrueNum" label="答对题数" align="center" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="integral" label="获得积分" align="center" show-overflow-tooltip>
+                    </el-table-column>
+                </el-table>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<script>
+    //  import taskForm from './task_form'
+    //  import questionsShow from '../../../questionsCenter/questionsManagement/questionsManagement_show'
+    import api from '../api'
+
+    let Util = null;
+    export default {
+        props: ['operailityData'],
+        data() {
+            return {
+                formValidate: {},
+                tableDate: []
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                this.ajax({
+                    ajaxSuccess: res => (this.formValidate = res.data),
+                    ajaxParams: {
+                        url: api.get.path + this.operailityData.id,
+                        method: api.get.method
+                    }
+                });
+                this.ajax({
+                    ajaxSuccess: res => (this.tableDate = res.data.dataList),
+                    ajaxParams: {
+                        url: api.ranking.path + this.operailityData.id,
+                        method: api.ranking.method
+                    }
+                });
+            }
+
+        },
+        components: {}
+    }
+</script>
+<style lang="scss">
+    .cttcs-content {
+        .el-input, .el-textarea {
+            width: 500px;
+        }
+    }
+</style>

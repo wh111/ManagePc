@@ -1,0 +1,415 @@
+import {formatDate, parseDate} from './date';
+import {goodType} from './goodTypes'
+import {subject} from './subjects';
+// import {projectDiffLevel} from './projectDiffLevel';
+import {paperTypesText} from "./paperTypes";
+import {questionsBasicType} from './questionsBasicTypes';
+import {utils as util} from './util'
+
+const getVueObj = function (vue) {
+    const typeNames = { // 声明全局类型描述文本
+        status: {
+            '0': '否',
+            '1': '是'
+        },
+        questionsType: {//试题类型
+            '1': '扩展题型',
+            '0': '普通题型'
+        },
+        term: {
+            '0': '上学期',
+            '1': '下学期'
+        },
+        stage: {//阶段
+            '0': '小学',
+            '1': '初中',
+            '2': '高中'
+        },
+        relationship: {  //与学生的关系
+            '0': '父亲',
+            '1': '母亲'
+        },
+        length: {//学制
+            '0': '六三制',
+            '1': '五四制'
+        },
+        lastLoginStatus: {
+            '0': '登录',
+            '1': '未登录'
+        },
+        unit: {
+            '0': '套',
+            '1': '份'
+        },
+        openType: {
+            '0': '公用题库',
+            '1': '私有题库'
+        },
+        gradeObj: null,
+        groups: {//是否组题，是否公用后选项
+            '0': '否',
+            '1': '是'
+        },
+        sex: {
+            '0': '男',
+            '1': '女'
+        },
+        teachTypes: {//教师资格种类
+            '0': '小学教师',
+            '1': '初中教师',
+            '2': '高中教师'
+        },
+        goodsStatus: {//商品状态
+            '0': '待审核',
+            '1': '在售',
+            '2': '驳回',
+            '3': '下架'
+        },
+        accountStatus: {
+            '0': '正常',
+            '1': '冻结'
+        },
+        orderStatus: {
+            '0': '未付款',
+            '1': '已付款',
+            '2': '已取消',
+            '3': '已完成'
+        },
+        msgPublishStatus: {
+            '0': '草稿',
+            '1': '已发布'
+        },
+        orgLevel: {
+            '0': "企业",
+            '1': "学校",
+            '2': "出版社",
+            '3': "教育机构"
+        },
+        proLevel: {
+            '0': "小学",
+            '1': "初中",
+            '2': "高中"
+        },
+        impLevel: {
+            '0': "一般",
+            '1': "重要",
+            '2': "非常重要"
+        },
+        mechanismManageAuditStatus: {
+            '0': "未审核",
+            '1': "审核通过",
+            '2': "审核驳回"
+        },
+        outofQuestionStatus: {
+            '0': "未处理",
+            '1': "已处理",
+            '2': "已冻结"
+        },
+        progressStatus: {//众包组题 状态
+            '0': '未开始',
+            '1': '进行中',
+            '2': '已结束'
+        },
+        selectStatus: {//收录状态
+            '0': '未处理',
+            '1': '已收录',
+            '2': '已驳回'
+        },
+        // 试卷组卷类型
+        papersTypes: {
+            // '0': '智能组卷',
+            // '1': '人工组卷'
+            '0': '试卷',
+            '1': '联考',
+            '2': '测验'
+        },
+        // 商品审批状态
+        auditProcessResult: {
+            'REPORT': '上报',
+            'AGREE': '同意',
+            'REJECT': '不同意'
+        },
+        commentStatus: {//评论状态
+            '0': '待审核',
+            '1': '已通过'
+        },
+        commentResult: {//评论类型
+            'POSITIVE': '好评',
+            'MODERATE': '中评',
+            'NEGATIVE': '差评'
+        },
+        msgStatus: {
+            'OPEN': '未办理',
+            'CLOSE': '已办理'
+        },
+        questionOpenType: {
+            '0': '共有',
+            '1': '私有'
+        },
+        answerText: {
+            '0': '错',
+            '1': '对'
+        },
+        //商品类别
+        goodType,
+        // 科目
+        subject,
+        // 试卷难度
+        projectDiffLevelObj: null,
+        // 试卷类型
+        paperTypesText,
+        // 基础题型
+        questionsBasicType
+    };
+
+    const filters = [ // 声明全局过滤器及回调函数
+        { // 货币格式化
+            name: "money",
+            call(value, n, str) { // n 保留小数点位数 | str 货币前缀 | 使用： 10 | money(3,'$') ===> $ 10.000
+                // 如果是非Number类型的直接返回源字符串，否则按照过滤器格式处理
+                return !isNaN(value) ? (str || '￥') + " " + (+value / 100).toFixed(typeof n === 'number' ? n : 2) : value / 100;
+            }
+        },
+        { // 默认图片
+            name: "isDefImg",
+            call(value) {
+                if (value) return value;
+                return '/static/image/physician.png'
+            }
+        },
+        {
+            name: 'formatSize',
+            call(value) {
+                let temp;
+                let init;
+                let float;
+                if (!value) return '0KB';
+                if (value < 1024) {
+                    return value + 'B';
+                } else if (value < (1024 * 1024)) {
+                    temp = value / 1024;
+                    temp = temp.toFixed(2);
+                    return temp + 'KB';
+                } else if (value < (1024 * 1024 * 1024)) {
+                    init = (value / (1024 * 1024));
+                    //float = (value % (1024*1024))/1024;
+                    return init.toFixed(2) + 'MB ' //+float.toFixed(2)+'KB';
+                } else {
+                    init = (value / (1024 * 1024 * 1024));
+                    //float = (value % (1024*1024*1024))/(1024*1024);
+                    return init.toFixed(2) + 'GB ' //+ float.toFixed(2) + 'MB';
+                }
+                return;
+            }
+        },
+        {
+            name: 'formatUploadSize',
+            call(value) {
+                let temp;
+                let init;
+                let float;
+                if (!value) return '0KB';
+                if (value < 1024) {
+                    return value + 'kB';
+                } else if (value < (1024 * 1024)) {
+                    temp = value / 1024;
+                    temp = temp.toFixed(2);
+                    return temp + 'MB';
+                } else if (value < (1024 * 1024 * 1024)) {
+                    init = (value / (1024 * 1024));
+                    //float = (value % (1024*1024))/1024;
+                    return init.toFixed(2) + 'GB ' //+float.toFixed(2)+'KB';
+                }
+                return;
+            }
+        },
+        {
+            name: 'formatLength', //格式化时长
+            call(value) {
+                let temp;
+                let init;
+                if (!value) return '0秒';
+                if (value < 60) {
+                    return value + '秒';
+                } else if (value < (60 * 60)) {
+                    init = parseInt(value / 60);
+                    temp = (value % 60);
+                    return init + '分' + temp + '秒';
+                } else {
+                    init = parseInt(value / (60 * 60));
+                    temp = parseInt((value % (60 * 60)) / 60);
+                    //float = (value % (1024*1024))/1024;
+                    return init + '时' + temp + '分';
+                }
+                return;
+            }
+        },
+        {
+            name: 'getStr',//传入字符串分割为数组
+            call(value, fileterName) {
+                let list = [];
+                if (!value) {
+                    return '-'
+                } else {
+                    value.split(',').map(item => list.push(typeNames[fileterName][item.toLocaleUpperCase()]))
+                }
+                return list.join('、')
+            }
+        },
+        {
+            name: 'getArrText', // 获取数组中的指定属性的值
+            call(arr, key) {
+                let list = [];
+                if (arr && arr instanceof Array) {
+                    arr.map(item => list.push(item[key]))
+                }
+                return list.join('、') || '-'
+            }
+        },
+        {
+            name: 'answerCode', // 文本转数组(1|2==>A、B)
+            call(str, splitStr = '|', joinStr = '、') {
+                let s = str.toString();
+                let list = s && s.split(splitStr) || [];
+                let code = [];
+                list.map(index => code.push(String.fromCharCode(+index + 65)))
+                return code.join(joinStr) || '-'
+            }
+        },
+        {
+            name: 'getCharCode', // 获取选项的索引字母
+            call(index) {
+                // A、B、C...
+                return String.fromCharCode(+index + 65)
+            }
+        },
+        {
+            name: 'formatTime',
+            call(value, str) {
+                return getDateDiff(value, str);
+            }
+        },
+        { // 时间格式化
+            name: "formatDate",
+            /**
+             * @param {any} value 需要处理的时间数据
+             * @param {any} format 字符模版 yyyy-MM-dd HH:mm:ss.SSS
+             * @returns
+             */
+            call(value, format) {
+                return typeof date == 'string' ? parseDate(value, format) : formatDate(value, format)
+            }
+        },
+        { // 移除html标签
+            name: "delHtmlTag",
+            call(html) {
+                let resultStr = '';
+                if (html) {
+                    resultStr = html.replace(/<[^>]+>/g, ""); //去掉html
+                    resultStr = resultStr.replace(/\ +/g, " "); //多个空格转为一个空格
+                    // resultStr = resultStr.replace(/[ ]/g, "");    //去掉空格
+                    resultStr = resultStr.replace(/[\r\n]/g, ""); //去掉回车换行
+                }
+                return resultStr
+            }
+        },
+        {
+            // 字符串截取
+            name: "sliceText",
+            call(val, len = 10, str = '') {
+                let temp = val && val.slice(0, len) || val;
+                return val.length > len ? temp + str : val
+            }
+        },
+        {
+            name: "diffLevelCode",
+            // 这里的第二个参数必须传vue实例
+            call(val, $vue) {
+                if (!typeNames.projectDiffLevelObj) {
+                    let temp = {};
+                    let obj = $vue.$store.getters['app/envs']('questionDiffMap');
+                    for (let key in obj) {
+                        temp[key.toLocaleUpperCase()] = obj[key];
+                    }
+                    typeNames.projectDiffLevelObj = temp;
+                }
+                return val && typeNames.projectDiffLevelObj instanceof Object && typeNames.projectDiffLevelObj[val.toLocaleUpperCase()] || val
+            }
+        },
+        {
+            name: "grade",
+            // 这里的第二个参数必须传vue实例
+            call(val, $vue) {
+                if (util._myVue) {
+                    $vue = util._myVue;
+                }
+                if (!typeNames.gradeObj) {
+                    let temp = {};
+                    let list = $vue.$store.getters['app/envs']('gradeList');
+                    list.map(item => {
+                        temp[item.code] = item.name;
+                    })
+                    typeNames.gradeObj = temp;
+                }
+                return typeNames.gradeObj instanceof Object && typeNames.gradeObj[val] || val
+            }
+        },
+        {
+            name: 'formatTimes', //格式化时长
+            call(value) {
+                let h = '00', m = '00', s = '00';
+                h = parseInt(value / 3600);
+                m = parseInt((value - h * 3600) / 60);
+                s = (value - h * 3600 - m * 60).toFixed(0);
+                return `${h}:${m}:${s}`
+            }
+        }
+    ];
+
+    function getDateDiff(dateTimeStamp, str) {
+        let minute = 1000 * 60;
+        let hour = minute * 60;
+        let day = hour * 24;
+        let halfamonth = day * 15;
+        let month = day * 30;
+
+        let now = new Date().getTime();
+        let diffValue = now - dateTimeStamp;
+
+        let result = "";
+        if (diffValue < 0) {
+            //若日期不符则弹出窗口告之
+            //alert("结束日期不能小于开始日期！");
+        }
+        let monthC = diffValue / month;
+        let weekC = diffValue / (7 * day);
+        let dayC = diffValue / day;
+        let hourC = diffValue / hour;
+        let minC = diffValue / minute;
+        if (monthC >= 1) {
+            result = str + parseInt(monthC) + "个月前";
+        } else if (weekC >= 1) {
+            result = str + parseInt(weekC) + "周前";
+        } else if (dayC >= 1) {
+            result = str + parseInt(dayC) + "天前";
+        } else if (hourC >= 1) {
+            result = str + parseInt(hourC) + "个小时前";
+        } else if (minC >= 1) {
+            result = str + parseInt(minC) + "分钟前";
+        } else
+            result = "刚刚";
+        return result;
+    }
+
+    // 全局注册自定义过滤器
+    filters.map(item => vue.filter(item.name, item.call)); // 在应用中直接通过name使用
+    Object.keys(typeNames).map(item => vue.filter(item, function (value) { // 在应用中直接通过typeNames中的对象名使用
+        if (typeof value === 'number' || typeof value === 'string') {
+            // 如果描述文本中没有匹配的则返回原字符
+            return typeNames[item][value.toString().toUpperCase()] || value
+        }
+        return value;
+    }))
+}
+
+export default getVueObj;

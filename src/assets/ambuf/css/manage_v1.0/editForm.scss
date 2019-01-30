@@ -1,0 +1,26 @@
+.editForm {
+    .el-date-editor.el-input {
+        width: 100%;
+    }
+    .el-select {
+        width: 100%;
+        .el-input {
+            width: 100%;
+        }
+    }
+}
+.debugVideoBox{
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid #ececec;
+}
+.debugVideoBox-left{
+  width: 500px;
+  height: 500px;
+  float: left;
+}
+.debugVideoBox-right{
+  width: 48%;
+  height: 500px;
+  float: right;
+}

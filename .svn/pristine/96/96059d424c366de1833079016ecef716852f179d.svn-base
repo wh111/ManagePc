@@ -1,0 +1,273 @@
+<!--
+****--@file     brushContest_list
+****--@date     2017/12/1 下午6:49
+****--@author   jhd
+****--@describe   刷题大赛
+-->
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <el-col>
+            <div>
+                <el-form label-width="100px" class="demo-ruleForm">
+                    <el-col :span="14" style="margin-bottom:20px">
+                      <el-button size="small" class="greenButton" @click="add">新建任务</el-button>
+                    </el-col>
+                </el-form>
+            </div>
+
+            <div id="myTable" ref="myTable">
+                <el-table align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                          style="width: 100%">
+                    <el-table-column prop="index" label="序号" width="70px" show-overflow-tooltip></el-table-column>
+                    <el-table-column label="任务名称" prop="name" show-overflow-tooltip></el-table-column>
+                    <el-table-column label="类型" align="center" prop="type" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            众包组题
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="发布者" prop="person" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            系统
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="发布日期" align="center" prop="createTime" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ scope.row.createTime | formatDate }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="开始时间" align="center" prop="beginTime" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ scope.row.beginTime | formatDate('yyyy-MM-dd HH:mm') }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="结束时间" align="center" prop="endTime" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ scope.row.endTime | formatDate('yyyy-MM-dd HH:mm') }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="状态" align="center" prop="progressStatus" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ scope.row.progressStatus | progressStatus }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" width="210">
+                        <template slot-scope="scope">
+                          <el-button size="small" class="tableMakeItem" @click="show(scope.row)">查看</el-button>
+                          <el-button v-if="scope.row.status == '已发布'" size="small" class="tableMakeItem"
+                                       @click="stop(scope.$index,scope.row)">停止
+                            </el-button>
+                          <el-button v-if="scope.row.status == '未发布'" size="small" class="tableMakeItem"
+                                     @click="start(scope.$index,scope.row)">发布
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="margin: 10px 50px 10px 0;">
+                    <div style="float: right;">
+                        <el-pagination
+                                @size-change="changePageSize"
+                                @current-change="changePage"
+                                :current-page.sync="myPages.currentPage"
+                                :page-size="myPages.pageSize"
+                                layout="total,prev, pager, next, jumper"
+                                :total="totalCount">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
+        </el-col>
+        <!--新增-->
+        <Modal
+                :mask-closable="false"
+                width="1000"
+                v-model="addModal"
+                title="新增任务"
+                class-name="vertical-center-modal"
+                :loading="loading">
+            <modal-header slot="header" :content="addId"></modal-header>
+            <add v-if="addModal" @cancel="cancel" @add="subCallback"></add>
+            <div slot="footer"></div>
+        </Modal>
+        <!--查看-->
+        <Modal
+                :mask-closable="false"
+                width="1000"
+                v-model="showModal"
+                title="查看任务"
+                class-name="vertical-center-modal"
+                :loading="loading">
+            <modal-header slot="header" :content="showId"></modal-header>
+            <show v-if="showModal" @cancel="cancel" @show="subCallback" :operaility-data="operailityData"></show>
+            <div slot="footer"></div>
+        </Modal>
+
+    </div>
+</template>
+<script>
+  import add from './Congregation_add.vue'
+  import show from './Congregation_show.vue'
+  import api from './api'
+
+  let Util = null
+  export default {
+    data () {
+      return {
+        //* 表格 *//
+        self: this,
+        totalCount: 0,
+        loading: false,
+        dynamicHt: 100, // 表格高度
+        multipleSelection: [],
+        operailityData: {},
+        tableData: [],
+        formValidate: {},
+        showId: {
+          id: 'show',
+          title: '查看任务'
+        },
+        addId: {
+          id: 'add',
+          title: '新增任务'
+        },
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      //初始化函数
+      init () {
+        Util = this.$util
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize, types: '0'}
+        }
+        this.setTableData()
+      },
+      /************************** 表格 ************************/
+      /*
+       * 设置表格数据
+       * @param isLoading Boolean 是否加载
+       */
+      setTableData (isLoading) {
+        Object.assign(this.queryQptions.params, this.formValidate)
+        this.ajax({
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: this.queryQptions
+        }, isLoading)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = this.addIndex(res.data.dataList || [])
+      },
+      //获取当前所选中的教材板块
+      materialChange (item) {
+        console.log(item)
+      },
+      //查看
+      show (item) {
+        this.operailityData = item
+        this.openModel('show')
+      },
+      //搜索查询
+      searchEvent () {
+        this.setTableData()
+      },
+      //新增弹窗
+      add () {
+        this.openModel('add')
+      },
+      //停止任务
+      stop () {
+        this.$confirm('此操作将停止该任务, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '操作成功!'
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+      },
+      //设置表格及分页的位置
+      setTableDynHeight () {
+        let content = this.$refs.content
+        let parHt = content.parentNode.offsetHeight
+        let myTable = this.$refs.myTable
+        let paginationHt = 102
+        this.dynamicHt = parHt - myTable.offsetTop - paginationHt
+        this.$refs.myTable.style.height = this.dynamicHt + 'px'
+        // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+      },
+      /*
+       * 监听子组件通讯的方法
+       * 作用:根据不同的参数关闭对应的模态
+       * @param targer string example:"add"、"edit"
+       * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+       * 监听子组件通讯的方法
+       * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+       * @param udata boolean 默认false  是否不需要刷新当前表格数据
+       * */
+      subCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.setTableData()
+        }
+      },
+      /*
+       * 打开指定的模态窗体
+       * @param options string 当前指定的模态:"add"、"edit"
+       * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+    },
+    mounted () {
+      //页面dom稳定后调用
+      this.$nextTick(function () {
+        //初始表格高度及分页位置
+        this.setTableDynHeight()
+        //为窗体绑定改变大小事件
+        let Event = Util.events
+        Event.addHandler(window, 'resize', this.setTableDynHeight)
+      })
+    },
+    components: {
+      add, show
+    }
+  }
+</script>
+<style lang="scss" scoped>
+    .clearfix:after {
+        content: " ";
+        display: block;
+        clear: both;
+        height: 0;
+    }
+
+    .clearfix {
+        zoom: 1;
+    }
+
+    .btn-lable {
+        font-size: 16px;
+    }
+</style>
+
+
+

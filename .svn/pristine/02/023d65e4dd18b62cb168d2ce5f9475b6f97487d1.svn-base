@@ -1,0 +1,20 @@
+const file = '/outofQuestion';
+const api = {
+	list: {//列表
+		path: file + '/list',
+		method: 'get'
+	},
+	get: {//查看
+		path: file + '/info?questionId=',
+		method: 'get'
+	},
+	enable: {//冻结  解冻
+		path: file + '/enable',
+		method: 'put'
+	},
+  reply:{//反馈
+	  path: file + '/reply',
+    method: 'post'
+  }
+}
+export default api

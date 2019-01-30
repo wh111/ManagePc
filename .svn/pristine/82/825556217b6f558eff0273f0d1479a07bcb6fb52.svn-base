@@ -1,0 +1,245 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <el-form :rules="rules" ref="searchObj" :model="searchObj" class="search-from" :inline="true">
+          <el-form-item label="日期：" prop="time" style="padding-left: 13px">
+                <el-select size="small" v-model="searchObj.time" clearable placeholder="请选择日期范围" @change="changeTime">
+                    <el-option label="全部" value=""></el-option>
+                    <el-option label="五天内" value="day"></el-option>
+                    <el-option label="一周内" value="week"></el-option>
+                    <el-option label="一月内" value="month"></el-option>
+                    <el-option label="一年内" value="year"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="订单号：" prop="no">
+                <el-input size="small" v-model="searchObj.no" placeholder="输入订单号"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button size="small" class="search-btn" @click="searchEvent">搜索</el-button>
+            </el-form-item>
+        </el-form>
+        <div id="intergralOrderTable" ref="table">
+
+            <div :style="{'height':dynamicHt + 'px'}" class="orderMain">
+                <template v-if="showData instanceof Array && showData.length">
+                    <order-item v-for="(item,index) in showData" :key="index" :showData="item"
+                                @cancel="cancelCall(item)"></order-item>
+                </template>
+                <p v-else class="noDataTips" :style="{'line-height':dynamicHt + 'px'}">{{ showData === null ? '订单加载中...' : '暂无相关订单' }}</p>
+            </div>
+
+            <div style="margin: 10px 50px 10px 0;">
+                <div style="float: right;">
+                    <el-pagination
+                            @size-change="changePageSize"
+                            @current-change="changePage"
+                            :current-page.sync="myPages.currentPage"
+                            :page-size="myPages.pageSize"
+                            layout="total,prev, pager, next, jumper"
+                            :total="totalCount">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+  import api from './api'
+  import orderItem from './exchangeGoods_listItem.vue'
+  import cancelOrder from './exchangeGoods_cancel.vue'
+  import { list as rules } from '../rules'
+
+  let Util = null
+  export default {
+    data () {
+      return {
+        rules,
+        searchObj: {
+          time: '',//日期类型
+          startTime: '',
+          endTime: '',
+          status: '',//状态
+          no: ''//订单号
+        },
+        //* 表格 *//
+        self: this,
+        totalCount: 0,
+        // loading: false,
+        dynamicHt: 0, // 表格高度
+        multipleSelection: [],
+        operailityData: {},
+        showData: null
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      //初始化函数
+      init () {
+        Util = this.$util
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize}
+        }
+        this.setTableData()
+      },
+      changeTime (val) {
+        let start = ''
+        let end = ''
+        if (val) {
+          end = new Date().getTime()
+          let now = new Date()
+          switch (val) {
+            case 'day': { // 五天内
+              start = now.setDate(now.getDate() - 5)
+              break
+            }
+            case 'week': { // 一周内
+              start = now.setDate(now.getDate() - 7)
+              break
+            }
+            case 'month': { // 一月内
+              start = now.setMonth(now.getMonth() - 1)
+              break
+            }
+            case 'year': { // 一年内
+              start = now.setFullYear(now.getFullYear() - 1)
+              break
+            }
+          }
+        }
+        this.searchObj.startTime = start
+        this.searchObj.endTime = end
+      },
+      /*
+      * 设置表格数据
+      * @param isLoading Boolean 是否加载
+      */
+      setTableData (isLoading) {
+        this.showData = null
+        Object.assign(this.queryQptions.params, this.searchObj)
+        this.ajax({
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: this.queryQptions
+        }, isLoading)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        this.totalCount = res.data.totalCount || 0
+        this.showData = this.addIndex(res.data.dataList || [])
+      },
+      //设置表格及分页的位置
+      setTableDynHeight () {
+        let contenHeight = this.$refs.content.parentNode.parentNode.offsetHeight
+        let tableTop = this.$refs.table.offsetTop
+        let paginationHt = 122
+        this.dynamicHt = contenHeight - tableTop - paginationHt
+      },
+      // 撤单
+      cancelCall (item) {
+        Util.dialog({
+          title: '撤销该订单',
+          width: '500px',
+          content: {id: 'orderCancelId', title: '撤销该订单'},
+          component: cancelOrder,
+          data: {operailityData: item},
+          close: () => this.subCallback(),
+          confirm: (result) => {
+          }
+        })
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:根据不同的参数关闭对应的模态
+      * @param targer string example:"add"、"edit"
+      * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+      * 监听子组件通讯的方法
+      * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+      * @param targer string example:"add"、"edit"
+      * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+      * 例如:errorTitle、errorTitle
+      *addMessTitle:{
+      *    type:'add',
+      *    successTitle:'添加成功!',
+      *    errorTitle:'添加失败!',
+      *    ajaxSuccess:'ajaxSuccess',
+      *    ajaxError:'ajaxError',
+      *    ajaxParams:{
+      *      url:'/role/add',
+      *      method:'post'
+      *    }
+      *    }
+      * @param udata boolean 默认false  是否不需要刷新当前表格数据
+      * */
+      subCallback () {
+        this.setshowData()
+      },
+      /*
+      * 打开指定的模态窗体
+      * @param options string 当前指定的模态:"add"、"edit"
+      * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+      //查看详情
+      show (item) {
+        Util.dialog({
+          title: '查看订单详情',
+          width: '1000px',
+          content: {id: 'showId', title: '查看订单详情'},
+          component: show,
+          data: {operailityData: item},
+          close: () => {
+          },
+          confirm: (result) => {
+          }
+        })
+      },
+      //搜索查询
+      searchEvent () {
+        let isSubmit = this.handleSubmit('searchObj')
+        if (isSubmit) {
+          this.setTableData()
+        }
+      },
+      /*
+     * 列表查询方法
+     * @param string 查询from的id
+     * */
+      handleSubmit (name) {
+        let flag = false
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            flag = true
+          } else {
+            this.errorMess('表单验证失败!')
+          }
+        })
+        return flag
+      },
+    },
+    mounted () {
+      //页面dom稳定后调用
+      this.$nextTick(function () {
+        //初始表格高度及分页位置
+        this.setTableDynHeight()
+        //为窗体绑定改变大小事件
+        let Event = Util.events
+        Event.addHandler(window, 'resize', this.setTableDynHeight)
+      })
+    },
+    components: {
+      orderItem, cancelOrder
+    }
+  }
+</script>
+
+<style lang="scss">
+    @import "../../../assets/ambuf/css/order/layout";
+</style>

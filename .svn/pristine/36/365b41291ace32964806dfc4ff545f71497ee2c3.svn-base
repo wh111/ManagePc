@@ -1,0 +1,55 @@
+<template>
+  <div class="recharge">
+      <el-form ref="form" :inline="true" v-model="form" class="demo-form-inline">
+          <el-row :offset="2" style="padding-top:15px;">
+              <el-col>今日作业布置量统计</el-col>
+            <el-form-item label="今日作业布置总量">30277</el-form-item>
+          </el-row>
+      </el-form>
+      <ve-line :data="chartData" :settings="chartSettings"></ve-line>
+  </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            form:{
+
+            }
+        }
+    },
+    created(){
+        this.chartData = {
+        columns: ['日期', '今日作业布置量', '今日布置作业人数'],
+        rows: [
+          { '今日作业布置量': 1523, '日期': '08月09日', '今日布置作业人数': 123},
+          { '今日作业布置量': 1223, '日期': '08月10日', '今日布置作业人数': 131},
+          { '今日作业布置量': 2123, '日期': '08月20日', '今日布置作业人数': 182},
+          { '今日作业布置量': 1123, '日期': '08月24日', '今日布置作业人数': 133},
+          { '今日作业布置量': 1238, '日期': '08月28日', '今日布置作业人数': 153},
+          { '今日作业布置量': 2123, '日期': '09月10日', '今日布置作业人数': 123}
+        ]
+      }
+      this.chartSettings = {
+        metrics: ['今日作业布置量','今日布置作业人数'],
+        dimension: ['日期']
+      }
+    },
+    methods:{
+
+    }
+}
+</script>
+<style lang="scss" scoped>
+    .recharge{
+        background: #ffffff;
+        border-radius: 5px;
+    }
+    .el-form{
+        margin-left:35px;
+        .el-col{
+            font-size: 18px;
+            line-height: 30px;
+        }
+    }
+</style>

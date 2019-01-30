@@ -1,0 +1,186 @@
+<template>
+    <el-row>
+        <el-form ref="formValidate" :model="formValidate" :rules="rules" label-width="140px">
+            <el-col>
+                <el-form-item label="科目：">{{ showData.subject | subject }}</el-form-item>
+            </el-col>
+            <el-form-item label="知识点名称：">
+                {{ showData.name }}
+            </el-form-item>
+            <el-form-item label="知识点描述：">
+                {{ showData.remark || '暂无描述' }}
+            </el-form-item>
+            <el-form-item label="知识点名称：">
+                <el-input v-model="searchObj.name" placeholder="输入知识点进行模糊搜索" style="width:50%"></el-input>
+                <el-button type="success" @click="seach">搜索</el-button>
+            </el-form-item>
+
+            <!--<el-col :span="6">-->
+            <!--<el-form-item label="学段：">{{ showData.stage | stage }}</el-form-item>-->
+            <!--</el-col>-->
+            <!--<el-col :span="6">-->
+            <!--<el-form-item label="年级：">{{ showData.grade | grade }}</el-form-item>-->
+            <!--</el-col>-->
+            <!--<el-col :span="6">-->
+            <!--<el-form-item label="学期：">{{ showData.term | term }}</el-form-item>-->
+            <!--</el-col>-->
+
+            <el-form-item label="前置知识点选择：" prop="beforeId" >
+                <div style="max-height: 250px;overflow-y: scroll">
+                    <el-checkbox-group v-model="formValidate.beforeId" v-if="knowledgeData && knowledgeData.length"
+                                       @change="selectBeforeIds">
+                        <template v-for="(item,index) in knowledgeData">
+                            <el-checkbox :key="index" :label="item.id" v-if="item.id != formValidate.id">
+                                {{ item.name }}
+                            </el-checkbox>
+                        </template>
+                    </el-checkbox-group>
+                    <span v-else>{{ knowledgeData === null ? '正在加载知识点' : '暂无知识点' }}</span>
+                </div>
+            </el-form-item>
+            <el-col align="center">
+                <el-button type="success" @click="submit">确定</el-button>
+                <el-button type="info" @click="cancel">取消</el-button>
+            </el-col>
+        </el-form>
+    </el-row>
+</template>
+<script>
+    let Util = null;
+    import api from './api';
+    import {knowledgeSystemManageSet as rules} from '../rules';
+
+    export default {
+        props: ['value'],
+        data() {
+            return {
+                rules,
+                searchObj: {
+                    name: ""
+                },
+                showData: {
+                    id: "",
+                    stage: "",
+                    subject: "",
+                    grade: "",
+                    term: "",
+                    name: "",
+                    remark: "",
+                    textbookVersionId: ""
+                },
+                knowledgeData: null,
+                formValidate: {
+                    id: '', // 知识点id
+                    beforeId: [],
+                    beforeIds: '' // 前置知识点
+                }
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                this.getShowData();
+            },
+            selectBeforeIds(idArr) {
+                let ids = idArr.join(',');
+                this.formValidate.beforeIds = ids;
+            },
+            getShowData() {
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (res.data instanceof Object) {
+                            this.showData = res.data;
+                            this.formValidate.id = res.data.id;
+                            let beforeId = [];
+                            res.data.before.map(item => beforeId.push(item.id));
+                            this.formValidate.beforeId = beforeId;
+                            this.getKnowledgeList();
+                            this.selectBeforeIds(beforeId);
+                        }
+                    },
+                    ajaxError: () => this.errorMess('获取数据失败，请重试'),
+                    ajaxParams: {
+                        url: api.get.path,
+                        method: api.get.method,
+                        params: {
+                            id: this.value.operailityData.id
+                        }
+                    }
+                };
+                this.ajax(opt)
+            },
+            getKnowledgeList() {
+                this.knowledgeData = [];
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (res.data instanceof Array) {
+                            this.knowledgeData = res.data
+                        }
+                    },
+                    ajaxError: () => this.errorMess('获取数据失败，请重试'),
+                    ajaxParams: {
+                        url: api.settingList.path,
+                        method: api.settingList.method,
+                        params: {
+                            name: this.searchObj.name,
+                            id: this.showData.id,
+                            subject: this.showData.subject
+//                            term: this.showData.term
+                        }
+                    }
+                };
+                this.ajax(opt)
+            },
+            submit() {
+                if (!this.submitForm('formValidate')) return;
+                let opt = {
+                    type: 'edit',
+                    callback: 'close',
+                    errorTitle: '设置失败',
+                    successTitle: '设置成功',
+                    ajaxSuccess: "ajaxSuccess",
+                    ajaxError: "ajaxError",
+                    ajaxParams: {
+                        url: api.set.path,
+                        method: api.set.method,
+                        data: this.getFormData(this.formValidate)
+                    }
+                };
+                this.ajax(opt)
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = this.$util._.defaultsDeep({}, data);
+                return myData;
+            },
+            cancel() {
+                this.$emit('confirm');
+            },
+            seach() {
+                if (this.showData.id) {
+                    this.getKnowledgeList()
+                }
+            }
+        }
+    }
+</script>

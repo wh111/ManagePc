@@ -1,0 +1,312 @@
+<template>
+    <div class="cqef-content">
+        <template v-if="showData instanceof Object">
+            <el-form ref="showData" :model="showData" class="demo-form-inline">
+                <p class="title">基本信息</p>
+                <el-row>
+                    <!--<el-form-item :span="4" label="教材：">人教版</el-form-item>-->
+                    <el-col :span="6">
+                        <el-form-item label="科目：">{{showData.subject | subject }}</el-form-item>
+                    </el-col>
+                    <!--<el-col :span="6">-->
+                    <!--<el-form-item label="年级：">{{showData.grade | grade}}</el-form-item>-->
+                    <!--</el-col>-->
+                    <!--<el-col :span="6">-->
+                    <!--<el-form-item label="学期：">{{showData.term | term }}</el-form-item>-->
+                    <!--</el-col>-->
+                    <el-col :span="6" v-if="!showData.questions.groups">
+                        <el-form-item label="题型：">
+                            {{ showData.questions.questionsTypeName }}
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="分值：">{{ getscore() }}</el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="难度：">{{ showData.questions.diffLevelCode | diffLevelCode(self) }}</el-form-item>
+                    </el-col>
+                    <!--<el-col :span="12">-->
+                    <!--<el-form-item label="权限：" class="width">{{ showData.openType | openType }}</el-form-item>-->
+                    <!--</el-col>-->
+                    <el-col>
+                        <el-form-item label="知识点：">
+                            {{ showData.questions.knowledgeList | getArrText('name') }}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+
+            <question-show :showData="showData.questions" :show-answer="true" :showScore="false"></question-show>
+
+            <el-row>
+                <el-table ref="tableData" :data="showData.userList" border style="width: 100%;margin-top: 20px"
+                          @selection-change="handleSelectionChange">
+                  <el-table-column type="selection" width="50"></el-table-column>
+                    <el-table-column prop="userName" label="纠错人" align="center">
+                    </el-table-column>
+                    <el-table-column prop="createTime" label="纠错日期" align="center">
+                        <template slot-scope="scope">
+                            {{ scope.row.createTime | formatDate }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="remark" label="错题原因" align="center">
+                    </el-table-column>
+                </el-table>
+            </el-row>
+            <el-row style="margin-top:20px">
+                <el-form :rules="rules" :model="formValidate" ref="formValidate">
+                    <el-form-item label="反馈信息：" prop="reply">
+                        <el-input v-if="!showData.status" size="small" type="textarea"
+                                  v-model="formValidate.reply"></el-input>
+                        <span v-else>{{ formValidate.reply }}</span>
+                    </el-form-item>
+                    <el-form-item label="增加积分：" prop="point">
+                        <template v-if="!showData.status">
+                            <el-input style="width: 200px" size="small"
+                                      v-model="formValidate.point"></el-input>
+                            <span>分</span>
+                        </template>
+                      <template v-else>
+                        {{formValidate.point}}分
+                      </template>
+                        <!--<span>{{ formValidate.point }}分</span>-->
+                    </el-form-item>
+                </el-form>
+            </el-row>
+            <el-row style="text-align:center">
+                <load-btn v-if="!showData.status" @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+                <el-button v-else size="small" type="success" @click="determine">返回</el-button>
+            </el-row>
+        </template>
+        <p v-else class="noDataTips">试题信息加载中...</p>
+    </div>
+</template>
+<script>
+  import show from '../questionsManagement/questionsManagement_show'
+  import api from './api'
+  import { wrongFeedbackReply as rules } from '../rules'
+  import questionShow from '../../common/questionShow/show'
+
+  let Util = null
+  export default {
+    props: ['operailityData'],
+    data () {
+      return {
+        rules,
+        self: this,
+        multipleSelection: [],
+        QuestionsTypeList: [],//题型列表
+        tagList: [],
+        loadBtn: {title: '提交', callParEvent: 'listenSubEvent'},
+        showData: null,
+        formValidate: {
+          reply: '',
+          point: '',
+          id: '',
+          userIds: ''
+        },
+        //当前组件提交(add)数据时,ajax处理的 基础信息设置
+        replyMessTitle: {
+          type: 'edit',
+          callback: 'edit',
+          successTitle: '修改成功!',
+          errorTitle: '修改失败!',
+          ajaxSuccess: res => this.$emit('show', 'show', '反馈成功'),
+          ajaxError: 'ajaxError',
+          ajaxParams: {
+              url: api.replyWrong.path,
+              method: api.replyWrong.method
+          }
+        },
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      init () {
+        Util = this.$util
+        let option = {
+          ajaxSuccess: res => {
+            if (res.data instanceof Object) {
+              this.showData = res.data
+              this.showData.tags != null ? this.tagList = this.showData.tags.split('|') : this.tagList
+              this.formValidate = {
+                reply: this.showData.reply,
+                point: this.showData.point,
+                id: this.showData.id,
+                userIds: ''
+              }
+              if (this.showData.userIds != '' && this.showData.userIds != null) {
+                let that = this
+                let arr = that.showData.userIds.split(',')
+                arr.map(function (item) {
+                  that.showData.userList.map(function (ids) {
+                    if (item == ids.userId) {
+                      that.multipleSelection.push(ids)
+                    }
+                  })
+                })
+                this.toggleSelection(this.multipleSelection)
+              }
+
+            }
+          },
+          ajaxError: () => this.errorMess('获取数据失败，请重试'),
+          ajaxParams: {
+            url: api.get.path + this.operailityData.questionId + '&id=' + this.operailityData.id + '&types=' + this.operailityData.types,
+            method: api.get.method
+          }
+        }
+        this.ajax(option)
+      },
+      getscore () {
+        let score = 0
+        let questions = this.showData.questions
+        if (questions.groups) {
+          questions.childQuestionsList.map(item => score += (item.score || 0))
+        } else {
+          score = questions.score || 0
+        }
+        return score.toFixed(1)
+      },
+      /**
+       * 默认选中状态
+       * */
+      toggleSelection (rows) {
+        this.$nextTick(function () {
+          if (rows) {
+            rows.forEach(row => {
+              this.$refs.tableData.toggleRowSelection(row)
+            })
+          } else {
+            this.$refs.tableData.clearSelection()
+          }
+        })
+      },
+      /*
+      * checkbox 选择后触发事件
+      * @param val Array 存在所有的选择每一个行数据
+      */
+      handleSelectionChange (val) {
+        this.multipleSelection = val
+//        if(this.multipleSelection.length > 0) return false
+        let ids = []
+        this.multipleSelection.map(function (item) {
+          ids.push(item.userId)
+        })
+        this.formValidate.userIds = ids.join()
+      },
+      determine () {
+        this.$emit('cancel', 'show')
+      },
+      edit () {
+        Util.dialog({
+          title: '修改',
+          width: '1000px', //可选项tiny/small/large/full, 对应el-dialog的size属性
+          component: show,
+          data: {},
+          // beforeClose: (done) => {
+          //     //点右上角关闭按钮后触发
+          //     console.log('dialog is closing');
+          //     done()
+          // },
+          close: () => {//关闭后触发
+            console.log('dialog is closed')
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      /*
+        * 监听子组件通讯的方法
+        * 作用:根据不同的参数关闭对应的模态
+        * @param targer string example:"add"、"edit"
+        * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+        * 点击提交按钮 监听是否验证通过
+        * @param formName string  form表单v-model数据对象名称
+        * @return flag boolean   form表单验证是否通过
+        * */
+      submitForm (formName) {
+        let flag = false
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            flag = true
+          }
+        })
+        return flag
+      },
+      /*
+      * 点击提交按钮 监听是否提交数据
+      * @param isLoadingFun boolean  form表单验证是否通过
+      * */
+      listenSubEvent (isLoadingFun) {
+        let isSubmit = this.submitForm('formValidate')
+        if (isSubmit) {
+          if (!isLoadingFun) isLoadingFun = function () {
+          }
+          isLoadingFun(true)
+          if (this.formValidate.userIds == '') {
+            this.errorMess('请选择反馈人员！')
+              isLoadingFun(false)
+            return false
+          }
+          this.replyMessTitle.ajaxParams.data = this.getFormData(this.formValidate)
+          this.ajax(this.replyMessTitle, isLoadingFun)
+        }
+      },
+      /*
+      * 获取表单数据
+      * @return string  格式:id=0&name=aa
+      * */
+      getFormData (data) {
+        let myData = Util._.defaultsDeep({}, data)
+        return myData
+      },
+      /*
+       * 打开指定的模态窗体
+       * @param options string 当前指定的模态:"add"、"edit"
+       * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      }
+    },
+    components: {
+      show, questionShow
+    }
+  }
+</script>
+
+<style lang="scss">
+    .cqef-content {
+        .title {
+            font-size: 17px;
+            margin-bottom: 20px;
+        }
+        .item-wrap {
+            font-size: 17px;
+            margin-left: 36px;
+            margin-bottom: 20px;
+            .item {
+                margin-left: 15px;
+            }
+        }
+        .label {
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        /*.el-textarea {*/
+        /*width: 600px;*/
+        /*}*/
+        .noDataTips {
+            line-height: 440px;
+            text-align: center;
+        }
+    }
+
+</style>

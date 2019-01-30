@@ -1,0 +1,127 @@
+<template>
+    <el-row>
+        <el-form ref="formValidate" :model="formValidate" :rules="rules" label-width="120px">
+            <el-form-item label="标题：" prop="title">
+                <el-input v-model="formValidate.title"></el-input>
+            </el-form-item>
+            <el-form-item label="创建者：">
+                {{ formValidate.operator }}
+            </el-form-item>
+            <el-form-item label="状态：">
+                {{ formValidate.status | msgPublishStatus }}
+            </el-form-item>
+            <el-form-item label="创建时间：">
+                {{ formValidate.createTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+            </el-form-item>
+            <el-form-item label="内容：" prop="content">
+                <el-input :rows="4" type="textarea" v-model="formValidate.content"></el-input>
+            </el-form-item>
+            <el-col align="center" v-show="canSave">
+              <el-button size="small" class="search-btn" type="primary" @click="submit('0')">保存</el-button>
+              <el-button size="small" class="search-btn" type="success" @click="submit('1')">发布</el-button>
+              <el-button size="small" class="tableMakeItemCancel" @click="cancel">取消</el-button>
+            </el-col>
+        </el-form>
+    </el-row>
+</template>
+<script>
+    let Util = null;
+    import api from './api';
+    import {message as rules} from '../rules';
+
+    export default {
+        props: ['value'],
+        data() {
+            return {
+                rules,
+                canSave: false,
+                formValidate: {
+                    id: '',
+                    title: "",
+                    content: "",
+                    operatorId: "",
+                    operator: "",
+                    createTime: "",
+                    status: ""
+                }
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            init() {//初始化函数
+                Util = this.$util;
+                this.getShowData()
+            },
+            getShowData() {
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (res.data instanceof Object) {
+                            for (let key in this.formValidate) {
+                                this.formValidate[key] = res.data[key]
+                            }
+                            this.canSave = true;
+                        }
+                    },
+                    ajaxError: () => this.errorMess('获取数据失败，请重试'),
+                    ajaxParams: {
+                        url: api.get.path,
+                        method: api.get.method,
+                        params: {
+                            id: this.value.operailityData.id
+                        }
+                    }
+                };
+                this.ajax(opt)
+            },
+            submit(status) {
+                let msg = {
+                    '0': '保存',
+                    '1': '上报'
+                };
+                if (!this.submitForm('formValidate')) return;
+                this.formValidate.status = status.toString();
+                let opt = {
+                    type: 'edit',
+                    callback: 'close',
+                    errorTitle: msg[status] + '失败',
+                    successTitle: msg[status] + '成功',
+                    ajaxSuccess: "ajaxSuccess",
+                    ajaxError: "ajaxError",
+                    ajaxParams: {
+                        url: api.edit.path,
+                        method: api.edit.method,
+                        data: this.getFormData(this.formValidate)
+                    }
+                };
+                this.ajax(opt)
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = this.$util._.defaultsDeep({}, data);
+                return myData;
+            },
+            cancel() {
+                this.$emit('confirm');
+            }
+        }
+    }
+</script>

@@ -1,0 +1,485 @@
+<template>
+  <div class="manage_page fillcontain">
+    <template v-if="hasLogin">
+      <div class="viewFramework-topbar" :class="maxIndx?'viewFramework-topbar-zindex':''">
+        <div class="ambuf-console-topbar">
+          <head-top @setZindex="setZindex"></head-top>
+        </div>
+      </div>
+      <el-row style="height: 100%;padding-top:60px">
+        <el-col style="height: 100%; background-color: #11a63f;width:200px;overflow: visible"
+                :style="{width:bigWidth?'200px':'54px'}">
+          <div style="height: 20px;text-align: center;background: #0c8b32;z-index: 1000;position: relative"
+               @click="changeWidth">
+            <img v-if="bigWidth" src="../../src/assets/images/111.png"/>
+            <img src="../../src/assets/images/right.png" v-else/>
+          </div>
+          <div style="position: relative">
+            <el-menu
+              default-active="2"
+              class="el-menu-vertical-demo"
+              :collapse="isCollapse"
+              @select="handleSelect"
+              @open="handleOpen"
+              unique-opened="true"
+              @close="handleClose"
+              background-color="#11a63f"
+              text-color="#555555"
+              router
+              active-text-color="#ffffff">
+              <el-submenu v-for="(item,index) in allMenu" :key="index" :index="item.identity" class="el-submenu-show "
+                          @mouseout.native="mouseout(item)" @mouseover.native="mouseOver(item)">
+                <template slot="title">
+                  <div class="icon">
+                    <img :class="show&&item.show?'showWhite':''"
+                         :style="{top:index>=3?-(25*index+3)+'px':-25*index+'px'}"
+                         src="../../src/assets/images/ic.png"/>
+
+                  </div>
+                  <div style="position: relative;z-index:10;width:0px" v-if="!bigWidth">
+                    <ul class="ul" v-if="show&& item.show">
+                      <li style="line-height: 40px"><b>{{item.name}}</b></li>
+                      <li @click="routeTo(item,cItem)" v-for="(cItem,cIndex) in item.children" :key="cIndex"> -
+                        <span :class="cItem.show?'buttom':''" class="hoverItem"> {{ cItem.name }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <!--<i class="el-icon-setting"></i>-->
+                  <span slot="title" v-if="bigWidth">{{ item.name }}</span>
+
+                </template>
+                <template v-if="item.children instanceof Array && item.children.length&&bigWidth">
+                  <el-menu-item v-for="(cItem,cIndex) in item.children" :key="cIndex"
+                                :class="cItem.name=='学生管理'&&isFirst?'is-active':''"
+                                @click.native="getPath(item,cItem)"
+                                :index="routerBase+'/manage/' + item.identity + '/' + cItem.identity">{{ cItem.name
+                    }}
+                  </el-menu-item>
+                </template>
+                <template v-slse-if="item.children instanceof Array && item.children.length&&!bigWidth">
+
+                </template>
+              </el-submenu>
+            </el-menu>
+            <!--<div class="ul">-->
+            <!--<ul v-for="(item,index) in allMenu" :style="{top:45*index+'px'}">-->
+            <!--<li >-->
+            <!--<ul v-if="item.children instanceof Array && item.children.length">-->
+            <!--<li  v-for="(cItem,cIndex) in item.children" >-->
+            <!--{{ cItem.name}}-->
+            <!--</li>-->
+            <!--</ul>-->
+
+            <!--</li>-->
+
+            <!--</ul>-->
+            <!--</div>-->
+          </div>
+        </el-col>
+        <el-col class="web-view-right" :class="!bigWidth?'web-view-right-inner':''">
+          <tab-view :father="father" :child="child"></tab-view>
+          <router-view></router-view>
+        </el-col>
+      </el-row>
+    </template>
+  </div>
+</template>
+
+<script>
+    import headTop from './common/header.vue'
+    import TabView from './common/TabView.vue'
+
+    let Util = null
+
+    export default {
+        data () {
+            return {
+                father: '用户中心',
+                child: '学生管理',
+                maxIndx: false,
+                isCollapse: false,
+                adminCookieKey: 'manager_login_token',
+                bigWidth: true,
+                hasLogin: false,
+                loading: null,
+                show: false,
+                indexPath: '',
+                allMenu: [], // 所有菜单
+                routerPathName: {}, // 路由路径
+                routerBase: '',
+                isFirst: true,
+            }
+        },
+        created () {
+            Util = this.$util
+            this.$util._myVue = this
+            // 获取默认首页
+            this.routerBase = Util.base;
+            this.indexPath = Util.base+this.$util.pathPrefix;
+            console.log(this.indexPath, '115')
+            // 获取系统变量
+            this.getEnvs()
+            this.getUserInfo()
+        },
+        methods: {
+            getPath (father, child) {
+                this.father = father.name
+                this.child = child.name
+                console.log(father, child)
+                this.isFirst = false
+                console.log(this.isFirst)
+            },
+            routeTo (item, cItem) {
+                this.father = item.name
+                this.child = cItem.name
+                this.$router.push({path: this.routerBase + '/manage/' + item.identity + '/' + cItem.identity})
+                this.allMenu.map((item1) => {
+
+                    item1.children.map((child) => {
+                        child.show = false
+                    })
+                })
+                cItem.show = true
+            },
+            mouseOver (item) {
+                item.show = true
+                this.show = true
+            },
+            mouseout (item) {
+                item.show = false
+                this.show = false
+            },
+            changeWidth () {
+                this.bigWidth = !this.bigWidth
+
+            },
+            // 获取用户信息
+            getUserInfo () {
+                let opt = {
+                    error: 'getUserInfoError',
+                    ajaxSuccess: res => this.getUserInfoSuccess(res),
+                    ajaxParams: {
+                        url: '/admin/getUserInfo',
+                        method: 'get',
+                    },
+                }
+                this.ajax(opt)
+            },
+            getEnvs () {
+                let opt = {
+                    ajaxSuccess: res => {
+                        this.$store.commit('app/initEnvs', res.data)
+                        window.src = ''
+                    },
+                    ajaxParams: {
+                        url: '/envs',
+                    },
+                }
+                this.ajax(opt)
+            },
+            getUserInfoError () {
+                // this.$cookie.delete(this.adminCookieKey);
+                this.errorMess('获取用户信息失败，请重新登录')
+                this.$router.push('login')
+            },
+
+            // 获取用户信息成功
+            getUserInfoSuccess (res) {
+                if (res.data instanceof Object && res.data.id) {
+                    this.$store.commit('user/updateInfo', res.data)
+                    let role = []
+                    if (res.data.role instanceof Array) {
+                        res.data.role.map(item => role.push(item.id))
+                    } else {
+                        role.push(res.data.role.id)
+                    }
+                    this.$store.commit('user/updateRole', role)
+                    // 加载动画
+                    this.loading = this.$loading({
+                        lock: true,
+                        text: 'Loading',
+                        spinner: 'el-icon-loading',
+                    })
+                    this.getMenus()
+                } else {
+                    // this.$cookie.delete(this.adminCookieKey);
+                    this.$router.push('login')
+                }
+            },
+
+            // 获取菜单
+            getMenus (role) {
+                let roleId = role || this.$store.getters['user/role'].join(',')
+                let oldPath = this.$router.history.current.path
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (res.data instanceof Object) {
+                            this.$store.commit('menu/updateAll', res.data)
+                            this.setMeusData(res)
+                            // 延时1秒关闭
+                            setTimeout(() => {
+                                this.hasLogin = true
+                                this.$router.push(
+                                    (oldPath && oldPath !== this.$util.pathPrefix) ? oldPath : this.indexPath)
+                                // 关闭加载动画
+                                this.loading.close()
+                            }, 1000)
+                        }
+                    },
+                    ajaxError: () => this.errorMess('菜单加载失败，请重试'),
+                    ajaxParams: {
+                        url: '/menu/queryByPermissions',
+                        method: 'get',
+                        params: {roleId},
+                    },
+                }
+                this.ajax(opt)
+            },
+
+            // 设置菜单数据
+            setMeusData (responseData) {
+                let temp = responseData.data || []
+                let data = []
+                if (temp.length > 0) {
+                    // 移除根节点
+                    temp.map(item => {
+                        if (item.id != -1) {
+                            data.push(item)
+                        }
+                    })
+                }
+                data.map((item) => {
+                    item.show = false
+                    item.children.map((child) => {
+                        child.show = false
+                    })
+                })
+
+                this.allMenu = data
+
+                this.indexPath += this.getChildrenPath(data, '/')
+
+                this.setRouterPathName(data, this.$util.pathPrefix)
+                this.$store.commit('menu/updateIndex', this.indexPath)
+                this.$store.commit('menu/updatePathName', this.routerPathName)
+            },
+
+            getChildrenPath (arr, path) {
+                if (arr instanceof Array && arr.length) {
+                    return path += this.getChildrenPath(arr[0].children, arr[0].identity)
+                }
+                return '/' + path
+            },
+
+            /**
+             * 获取所有后台配置的路由地址对应的文本描述
+             * @param data
+             * @param first
+             * @param parItem
+             */
+            setRouterPathName (data, parItem) {
+                for (var i = 0, item; i < data.length; i++) {
+                    item = data[i]
+
+                    item['path'] = (parItem['path'] || parItem) + '/' + item.identity
+
+                    this.routerPathName[item['path']] = item['name']
+                    if (item.children instanceof Array && item.children.length) {
+                        this.setRouterPathName(item.children, item)
+                    }
+                }
+            },
+
+            /*
+            * 设置头部导航的z-index
+            * @param flag blooean  是否需要设置index
+            * */
+            setZindex (flag) {
+                this.maxIndx = flag
+            },
+            handleViewSubNav () {
+                this.isCollapse = !this.isCollapse
+            },
+            //判断点击的菜单
+            handleOpen (key, keyPath) {
+                console.log(key, keyPath)
+            },
+            handleClose (key, keyPath) {
+                console.log(key, keyPath)
+            },
+            handleSelect (key, keyPath) {
+                console.log(keyPath)
+
+            },
+        },
+        components: {
+            headTop,
+            TabView,
+        },
+    }
+</script>
+
+
+<style lang="less">
+  @import '../assets/style/mixin';
+
+  .manage_page {
+    .el-button + .el-button {
+      margin-left: 1px;
+    }
+    .is-active {
+      font-weight: bold;
+      color: #11a63f !important;
+    }
+    .showWhite {
+      left: -22px;
+    }
+    .el-menu-vertical-demo {
+      overflow: visible;
+    }
+
+    .el-submenu .el-menu-item {
+      height: 30px;
+      line-height: 30px;
+    }
+    .el-submenu-show {
+      position: relative;
+    }
+    .el-menu {
+      border-right: none;
+    }
+    .ul {
+      position: absolute;
+      overflow: visible;
+      left: 34px;
+      top: -45px;
+      width: 150px;
+      // background-color:  #11a63f;
+      background: #0c8b32;
+      padding-left: 20px;
+      color: #fff;
+      font-size: 14px;
+      z-index: 10;
+      padding-bottom: 20px;
+      li {
+        line-height: 28px;
+        .buttom {
+          text-decoration: underline;
+        }
+      }
+      li:hover .hoverItem {
+        text-decoration: underline;
+      }
+    }
+    .icon {
+      background: rgb(17, 166, 63);
+      width: 17px;
+      display: inline-block;
+      height: 15px;
+      margin-top: 2px;
+      overflow: hidden;
+      z-index: 10;
+      position: relative;
+      img {
+        position: relative;
+      }
+
+    }
+    .icon:hover {
+      background: #0c8b32;
+    }
+    .el-submenu__title:hover .icon {
+      background: #0c8b32;
+    }
+    .el-submenu__title {
+      border-bottom: 1px solid #0c8b32;
+    }
+    .sidebar-fold {
+      color: #11a63f;
+      cursor: pointer;
+      font-size: 12px;
+      height: 30px;
+      line-height: 30px !important;
+      text-align: center;
+      width: 180px;
+    }
+
+    .sidebar-min {
+      width: 4%;
+    }
+
+    .web-view {
+      width: 96%;
+    }
+
+    .web-view-right {
+      height: 100%;
+      float: none;
+      margin-left: 200px;
+      width: auto;
+      position: relative;
+      overflow: hidden;
+      background: #bfbfbf61;
+      padding: 0px 30px 25px 25px;
+    }
+    .web-view-right-inner {
+      margin-left: 54px;
+    }
+
+    .app-levelbar.el-breadcrumb {
+      display: inline-block;
+      font-size: 14px;
+      line-height: 50px;
+      margin-left: 10px;
+      .no-redirect {
+        color: #97a8be;
+        cursor: text;
+      }
+    }
+
+    .el-submenu .el-submenu__title i, .el-submenu .el-submenu__title span {
+      color: #ffffff !important;
+    }
+
+    .is-opened .el-submenu__title i {
+      color: #ffffff !important;
+    }
+
+    .is-opened .el-submenu__icon-arrow {
+      color: #ffffff !important;
+    }
+
+    .is-opened .el-submenu__title span {
+      color: #ffffff !important;
+      font-weight: 500 !important;
+    }
+
+    .is-active .el-menu, .is-opened .el-menu {
+      background: #ffffff !important;
+      .el-menu-item {
+        background: #ffffff !important;
+        font-weight: normal;
+      }
+    }
+
+    .is-active .el-menu .is-active {
+      font-weight: bold;
+      color: #11a63f !important;
+    }
+
+    .is-active .el-menu:hover {
+      color: #11a63f !important;
+    }
+
+    .el-menu-item:hover {
+      color: #11a63f !important;
+    }
+    .el-submenu__title {
+      height: 45px;
+      line-height: 45px;
+    }
+    .el-table__body-wrapper {
+      overflow-x: hidden;
+    }
+  }
+</style>

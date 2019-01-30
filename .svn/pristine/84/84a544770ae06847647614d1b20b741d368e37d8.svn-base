@@ -1,0 +1,351 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <el-col>
+            <div>
+                <el-form :rules="rules" ref="formValidate" :model="formValidate" class="demo-ruleForm" label-width="80px">
+                    <el-row class="search-from">
+                        <el-col :span="5">
+                            <el-form-item label="家长姓名" prop="name">
+                                <el-input size="small" v-model="formValidate.name"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="5">
+                            <el-form-item label="手机号" prop="mobile">
+                                <el-input size="small" v-model="formValidate.mobile"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <!-- <el-col :span="4">
+                          <el-form-item label="纠错人">
+                            <el-input v-model="formValidate.code" placeholder="题目编号"></el-input>
+                          </el-form-item>
+                        </el-col> -->
+                        <el-col :span="2">
+                          <el-button class="search-btn" size="small" @click="searchEvent">搜索</el-button>
+                        </el-col>
+
+                    </el-row>
+                    <!-- <el-col :span="14" style="margin-bottom:20px">
+                      <el-button type="danger" @click="toRemove">批量删除</el-button>
+                      <el-button type="primary" @click="toRemove">新增家长</el-button>
+                    </el-col> -->
+                </el-form>
+            </div>
+
+            <div id="myTable" ref="myTable">
+                <el-table
+                        sortable="custom"
+                        @sort-change="sortChange"
+                        align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                        style="width: 100%"
+                >
+                  <el-table-column prop="index" label="序号" align="center" width="70px"
+                                   show-overflow-tooltip></el-table-column>
+                    <el-table-column
+                            prop="name"
+                            label="家长姓名"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="studentList"
+                            label="关联学生"
+                            show-overflow-tooltip
+                    >
+                        <template slot-scope="scope">
+                            <span v-for="(item,index) in scope.row.studentList" :key="item.name">{{item.name}},</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="relationship"
+                            label="关系"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                        <template slot-scope="scope">
+                            {{ scope.row.relationship | relationship}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="mobile"
+                            label="手机号"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="wechat"
+                            label="微信号"
+                            show-overflow-tooltip
+                            align="center"
+                    >
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" width="280">
+                        <template slot-scope="scope">
+                          <el-button class="tableMakeItem" size="small" @click="add(scope.row)">添加学生</el-button>
+                          <el-button class="tableMakeItem" size="small" @click="edit(scope.row)">解除</el-button>
+                          <el-button class="tableMakeItem" v-if="scope.row.accountStatus == '0'" size="small"
+                                       @click="enable(scope.row,'1')">冻结
+                            </el-button>
+                          <el-button class="tableMakeItem" v-else size="small" @click="enable(scope.row,'0')">恢复
+                          </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="margin: 10px 50px 10px 0;">
+                    <div style="float: right;">
+                        <el-pagination
+                                @size-change="changePageSize"
+                                @current-change="changePage"
+                                :current-page.sync="myPages.currentPage"
+                                :page-size="myPages.pageSize"
+                                layout="total,prev, pager, next, jumper"
+                                :total="totalCount">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
+        </el-col>
+    </div>
+</template>
+<script>
+  import add from './parentManage_add.vue'
+  import edit from './parentManage_edit.vue'
+  import api from './api'
+  import { list as rules } from './rules'
+
+  let Util = null
+  export default {
+    data () {
+      return {
+        rules,
+        //* 表格 *//
+        self: this,
+        totalCount: 0,
+        // loading: false,
+        dynamicHt: 100, // 表格高度
+        multipleSelection: [],
+        operailityData: {},
+        tableData: [],
+        formValidate: {
+          mobile: '',//手机号
+          name: '',//家长姓名
+        },
+      }
+    },
+    created () {
+      this.init()
+    },
+    methods: {
+      //初始化函数
+      init () {
+        Util = this.$util
+        this.myPages = Util.pageInitPrams
+        this.queryQptions = {
+          url: api.list.path,
+          params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize}
+        }
+        this.setTableData()
+      },
+      /************************** 表格 ************************/
+      /*
+       * 设置表格数据
+       * @param isLoading Boolean 是否加载
+       */
+      setTableData (isLoading) {
+        Object.assign(this.queryQptions.params, this.formValidate)
+        this.ajax({
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: this.queryQptions
+        }, isLoading)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res, m, loading) {
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = this.addIndex(res.data.dataList || [])
+      },
+      //添加学生
+      add (item) {
+        Util.dialog({
+          title: '添加学生',
+          width: '1000px',
+          content: {id: 'addId', title: '添加学生'},
+          component: add,
+          data: {
+            dialogData: item
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+      //修改
+      edit (item) {
+        Util.dialog({
+          title: '修改',
+          width: '1000px',
+          content: {id: 'editId', title: '修改'},
+          component: edit,
+          data: {
+            dialogData: item,
+          },
+          close: () => {//关闭后触发
+            this.subCallback()
+          },
+          confirm: (result) => {//显式$emit('confirm')时触发
+            this.subCallback()
+//            console.log('dialog is confirmed, and dialog result is ', result)
+          }
+        })
+      },
+
+      //搜索查询
+      searchEvent () {
+        let isSubmit = this.handleSubmit('formValidate')
+        if (isSubmit) {
+          this.setTableData()
+        }
+      },
+      /*
+     * 列表查询方法
+     * @param string 查询from的id
+     * */
+      handleSubmit (name) {
+        let flag = false
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            flag = true
+          } else {
+            this.errorMess('表单验证失败!')
+          }
+        })
+        return flag
+      },
+      //数据排序
+      sortChange (row) {
+        console.log(row)
+      },
+      enable (item, status) {//冻结   解冻
+        if (status == '1') {
+          Util.todoConfirm({
+            title: '确定冻结该用户吗？',
+            content: {id: 'todoId', title: '冻结该用户'},
+            data: {
+              data: {ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id'), accountStatus: '1'},
+              api: api.enable,
+              msg: '冻结'
+            },
+            close: () => {//关闭后触发
+              this.subCallback()
+            },
+            confirm: (result) => {
+            }
+          })
+        } else {
+          Util.todoConfirm({
+            title: '确定恢复该用户吗？',
+            content: {id: 'todoId', title: '恢复该用户'},
+            data: {
+              data: {ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id'), accountStatus: '0'},
+              api: api.enable,
+              msg: '恢复'
+            },
+            close: () => {//关闭后触发
+              this.subCallback()
+            },
+            confirm: (result) => {
+            }
+          })
+        }
+      },
+      //设置表格及分页的位置
+      setTableDynHeight () {
+        let content = this.$refs.content
+        let parHt = content.parentNode.offsetHeight
+        let myTable = this.$refs.myTable
+        let paginationHt = 50
+        this.dynamicHt = parHt - myTable.offsetTop - paginationHt
+        this.$refs.myTable.style.height = this.dynamicHt + 'px'
+        // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+      },
+      /*
+       * 监听子组件通讯的方法
+       * 作用:根据不同的参数关闭对应的模态
+       * @param targer string example:"add"、"edit"
+       * */
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      /*
+       * 监听子组件通讯的方法
+       * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+       * @param targer string example:"add"、"edit"
+       * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+       * 例如:errorTitle、errorTitle
+       *addMessTitle:{
+       *    type:'add',
+       *    successTitle:'添加成功!',
+       *    errorTitle:'添加失败!',
+       *    ajaxSuccess:'ajaxSuccess',
+       *    ajaxError:'ajaxError',
+       *    ajaxParams:{
+       *      url:'/role/add',
+       *      method:'post'
+       *    }
+       *    }
+       * @param udata boolean 默认false  是否不需要刷新当前表格数据
+       * */
+      subCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.setTableData()
+        }
+      },
+      /*
+       * 打开指定的模态窗体
+       * @param options string 当前指定的模态:"add"、"edit"
+       * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+    },
+    mounted () {
+      //页面dom稳定后调用
+      this.$nextTick(function () {
+        //初始表格高度及分页位置
+        this.setTableDynHeight()
+        //为窗体绑定改变大小事件
+        let Event = Util.events
+        Event.addHandler(window, 'resize', this.setTableDynHeight)
+      })
+    },
+    components: {
+      add, edit
+    }
+  }
+</script>
+
+<style lang="scss" scoped>
+    .tip {
+        margin-left: 20px;
+        i {
+            background: #e0b9b6;
+            border-radius: 50%;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            color: #000000;
+            text-align: center;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+    }
+
+</style>
+
+
+

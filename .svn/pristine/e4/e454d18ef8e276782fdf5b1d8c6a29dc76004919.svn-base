@@ -1,0 +1,11 @@
+/* 全局变量 */
+
+// 外边距
+$margin: 10px;
+
+// 内边距
+$padding: 16px;
+
+// 边框
+$borderWidth: 1px; // 边框宽度
+$borderColor: #d8dce5; // 边框颜色

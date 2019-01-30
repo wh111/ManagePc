@@ -1,0 +1,413 @@
+<!--
+****--@file     taskPublish_add
+****--@date     2017/12/4 下午2:26
+****--@author   jhd
+****--@describe   新建刷题大赛
+-->
+<template>
+    <el-row class="ctta-content">
+        <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="130px">
+            <el-form-item prop="name" label="任务名称：">
+                <el-input v-model="formValidate.name"></el-input>
+            </el-form-item>
+            <el-form-item prop="" label="任务类型：">
+                刷题大赛
+            </el-form-item>
+            <el-form-item prop="" label="发布者：">
+              系统
+            </el-form-item>
+            <el-form-item prop="seasonId" label="赛季选择：">
+                <el-select v-model="formValidate.seasonId" placeholder="请选择" @change="selectSeason">
+                    <template v-for="item in seasonOptions">
+                        <el-option :key="item.id" :label="item.title" :value="item.id">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+          <date-group :dateGroup="{text:'',starTimes:formValidate.startTime,endTimes:formValidate.endTime}"
+                      style="display: inline;">
+            <el-form-item slot="start" prop="beginTime" label="开始时间">
+              <el-date-picker v-model="formValidate.startTime" type="datetime" :editable="false"
+                                    placeholder="选择时间" :picker-options="pickerOptions0"
+                                    @change="handleStartTime">
+                    </el-date-picker>
+                </el-form-item>
+                <i></i>
+            <el-form-item slot="end" prop="endTime" label="结束时间">
+                    <el-date-picker v-model="formValidate.endTime" type="datetime" :editable="false"
+                                    placeholder="选择时间" :picker-options="pickerOptions1"
+                                    @change="handleEndTime">
+                    </el-date-picker>
+                </el-form-item>
+            </date-group>
+            <el-form-item prop="remark" label="任务描述：">
+                <el-input :rows="4" type="textarea" v-model="formValidate.remark"></el-input>
+            </el-form-item>
+            <el-form-item label="任务内容：">
+              <el-button @click="addZn" type="success" class="greenButton">创建题库</el-button>
+                <i style="margin-left: 20px" v-if="formValidate.questionIds" class="el-icon-success"></i>
+            </el-form-item>
+            <el-form-item class="el-form-item is-required" prop="rewardConfigList" label="设置积分奖励：">
+                <!--<el-input v-model="formValidate.integral"></el-input>-->
+                <!--<p>（答对一题获得积分数量）</p>-->
+                <el-col>
+                    <el-col v-for="(item,index) in formValidate.rewardConfigList" :key="index">
+                        第
+                        <el-input style="width: 150px" v-model="item.startRanking"
+                                  @change="inputCheck(index,'startRanking')"></el-input>
+                        名到第
+                        <el-input style="width: 150px" v-model="item.endRanking"
+                                  @change="inputCheck(index,'endRanking')"></el-input>
+                        名，奖励积分
+                        <el-input style="width: 150px" v-model="item.integral"
+                                  @change="inputCheck(index,'integral')"></el-input>
+                        <template v-if="index == formValidate.rewardConfigList.length-1">
+                          <el-button class="tableMakeItemCancel" style="margin-left: 10px" @click="add">添加</el-button>
+                          <el-button class="tableMakeItemCancel" @click="del(index)" v-show="index != 0">删除</el-button>
+                        </template>
+                    </el-col>
+                </el-col>
+            </el-form-item>
+            <el-col>
+                <el-col :span="12">
+                    <el-form-item prop="subject" label="科目：">
+                        {{ (formValidate.subject || '-') | subject }}
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item prop="subject" label="年级：">
+                        {{ (formValidate.grade || '-') | grade }}
+                    </el-form-item>
+                </el-col>
+            </el-col>
+        </el-form>
+        <p style="text-align: center">
+            <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+          <el-button size="small" class="tableMakeItemCancel" @click="close">取消</el-button>
+        </p>
+        <!-- 模态框 增加（add） -->
+        <Modal :mask-closable="false" v-model="addZnModal" height="200" title="对话框标题" class-name="vertical-center-modal"
+               :width="1000">
+            <modal-header slot="header" :content="contentHeader.addZnId"></modal-header>
+            <add-zn v-if="addZnModal" @cancel="cancel" @getQuestion="getQuestion" :types="addTypes"></add-zn>
+            <div slot="footer"></div>
+        </Modal>
+    </el-row>
+</template>
+<script>
+    /*当前组件必要引入*/
+    //引入表单验证规则
+    import {CongregationAdd as rules} from "../rules";
+    //当前组件引入全局的util
+    let Util = null;
+    import api from "./api";
+    import addZn from "./zn/add.vue";
+    import dateGroup from '../../../components/common/dateGroup.vue'
+
+    export default {
+        data() {
+            return {
+                rules,
+                addZnModal: false,
+                addTypes: "",
+                title: "",
+                seasonOptions: {},
+                questionBank: {}, // 生成题库
+                contentHeader: {
+                    addZnId: {
+                        id: "addZnId",
+                        title: "生成题库"
+                    }
+                },
+                loadBtn: {
+                    title: "提交",
+                    callParEvent: "listenSubEvent"
+                },
+                formValidate: {
+                    name: "",
+                    // types: "0",
+                    remark: "", // 任务描述
+                    seasonId: '', // 赛季id
+                    beginTime: "", // 开始时间
+                    endTime: "", //结束时间
+                    subject: '', // 科目
+                    // integral: '', // 分数
+                    rewardConfigList: [
+                        {
+                            "startRanking": '',//排名开始
+                            "endRanking": '',//排名结束
+                            "integral": '' // 奖励积分
+                        },
+                        {
+                            "startRanking": '',//排名开始
+                            "endRanking": '',//排名结束
+                            "integral": '' // 奖励积分
+                        },
+                        {
+                            "startRanking": '',//排名开始
+                            "endRanking": '',//排名结束
+                            "integral": '' // 奖励积分
+                        }
+                    ],
+                    grade: '', // 年级
+                    questionIds: "" //试题ID ，多个逗号隔开
+                },
+                addMessTitle: {
+                    type: "add",
+                    callback: "close",
+                    successTitle: "添加成功!",
+                    errorTitle: "添加失败!",
+                    ajaxSuccess: res => this.$emit("add", "add", "添加成功"),
+                    ajaxError: "ajaxError",
+                    ajaxParams: {
+                        jsonString: true,
+                        url: api.add.path,
+                        method: api.add.method
+                    }
+                }
+            };
+        },
+        methods: {
+            //初始化请求列表数据
+            init() {
+                Util = this.$util;
+                //        this.ajax({
+                //          ajaxSuccess: res => (this.textbook = res.data),
+                //          ajaxParams: {
+                //            url: '/textbook/version/all',
+                //            method: 'get'
+                //          }
+                //        });
+                this.getSeasonOptions()
+            },
+            getSeasonOptions() {
+                let opt = {
+                    ajaxSuccess: res => {
+                        let resData = res.data;
+                        let data = [];
+                        let temp = {};
+                        let sel = ''; // 默认选择的赛季
+                        let now = new Date();
+//                        now.setHours(now.getHours() + 1);
+                        resData.map(item => {
+                            if (item.endTime && item.startTime && item.endTime > new Date().getTime()) {
+                                data.push(item)
+                            }
+                        });
+                        data.sort((a, b) => a.startTime > b.startTime);
+                        if (data instanceof Array) {
+                            data.map(item => {
+                                temp[item.id] = item;
+                                // 根据当前时间获取默认赛季
+                                if (!sel && item.startTime < now.getTime() && item.endTime > now.getTime()) {
+                                    sel = item.id
+                                }
+                            })
+                        }
+                        this.seasonOptions = temp;
+
+
+                        if (sel) {
+                            this.formValidate.seasonId = sel;
+                            this.selectSeason(sel, now);
+                        }
+                        this.endTimes = new Date(this.formValidate.endTime).getTime()
+                    },
+                    ajaxParams: {
+                        url: api.getSeason.path,
+                        method: api.getSeason.method
+                    }
+                }
+                this.ajax(opt)
+            },
+            selectSeason(id, startTime) {
+                let now = new Date();
+//                now.setHours(now.getHours() + 1);
+                let temp = this.seasonOptions[id];
+                let beginTime = startTime || temp.startTime;
+                // 处理赛季时间与当前时间进行的关系
+                if (temp.startTime < now.getTime() && temp.endTime > now.getTime()) {
+                    beginTime = now
+                }
+                this.formValidate.beginTime = new Date(beginTime);
+                this.formValidate.endTime = new Date(temp.endTime);
+            },
+            // 添加积分奖励规则
+            add() {
+                this.formValidate.rewardConfigList.push({
+                    "startRanking": '',//排名开始
+                    "endRanking": '',//排名结束
+                    "integral": '' // 奖励积分
+                })
+            },
+            // 删除积分奖励规则
+            del(index) {
+                this.formValidate.rewardConfigList.splice(index, 1)
+            },
+            // 输入检测
+            inputCheck(index, key) {
+                let thisObj = this.formValidate.rewardConfigList[index];
+                let preObj = null;
+                if (index) {
+                    preObj = this.formValidate.rewardConfigList[index - 1];
+                }
+                if (thisObj[key] && !/^\d+$/.test(thisObj[key])) {
+                    thisObj[key] = '';
+                    this.errorMess('请输入有效数字');
+                    return
+                }
+                if (key == 'integral') {
+                    return
+                }
+                if (thisObj.startRanking && thisObj.endRanking && +thisObj.startRanking > +thisObj.endRanking || !thisObj.startRanking) {
+                    thisObj[key] = '';
+                    this.errorMess('名次范围输入无效');
+                    return
+                }
+                if (preObj && (!preObj.endRanking || +thisObj.startRanking <= +preObj.endRanking)) {
+                    thisObj[key] = '';
+                    this.errorMess('名次范围输入无效');
+                    return
+                }
+            },
+            //智能组卷
+            addZn() {
+                this.addTypes = "1";
+                this.openModel("addZn");
+            },
+            // 智能组卷预览
+            getQuestion(obj) {
+                this.title = "已选择试题";
+                this.questionBank = obj;
+                this.formValidate.grade = obj.grade;
+                this.formValidate.subject = obj.subject;
+                this.addZnModal = false;
+                let questionIds = [];
+                // 不支持组题
+                obj.questionsList.map(item => questionIds.push(item.id));
+                this.formValidate.questionIds = questionIds.join(',');
+            },
+            /*
+             * 点击提交按钮 监听是否提交数据
+             * @param isLoadingFun boolean  form表单验证是否通过
+             * */
+            listenSubEvent(isLoadingFun) {
+                let isSubmit = this.submitForm("formValidate");
+                if (isSubmit && this.checkData()) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+                    let rewardConfigList = [];
+                    let data = this.getFormData(this.formValidate);
+                    data.beginTime = new Date(data.startTime).getTime()
+                    data.endTime = new Date(data.endTime).getTime();
+                    data.rewardConfigList.map(item => item.startRanking && rewardConfigList.push(item));
+                    data.rewardConfigList = rewardConfigList;
+                    this.addMessTitle.ajaxParams.data = data;
+                    this.addMessTitle.ajaxParams.data.beginTime = data.beginTime - 3600000 + 3600000 / 60
+                    this.ajax(this.addMessTitle, isLoadingFun);
+                }
+            },
+            checkData() {
+                let data = this.getFormData(this.formValidate);
+                let start = 0;
+                let num = 0; // 有效的数据
+                data.rewardConfigList.forEach((item, index) => {
+                    if (item.startRanking || item.endRanking || item.integral) {
+                        if (!item.startRanking || !item.endRanking || +item.startRanking > +item.endRanking) {
+                            this.errorMess(`请正确填写第${index + 1}项的名次范围`);
+                            return false
+                        }
+                        if (!item.integral) {
+                            this.errorMess(`请填写第${index + 1}项的积分数量`);
+                            return false
+                        }
+                        if (index > 0) {
+                            start = data.rewardConfigList[index - 1].endRanking;
+                            if (+item.startRanking <= +start) {
+                                this.errorMess(`第${index + 1}项的名次范围填写不正确`);
+                                return false
+                            }
+                        }
+                        num++;
+                    }
+                });
+                if (!num) {
+                    this.errorMess(`积分奖励至少完整填写一项`);
+                }
+                return !!num
+            },
+            /*
+             * 点击提交按钮 监听是否验证通过
+             * @param formName string  form表单v-model数据对象名称
+             * @return flag boolean   form表单验证是否通过
+             * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                if (flag && this.formValidate.questionIds === "") {
+                    this.errorMess("请创建题库！");
+                    flag = false;
+                }
+                return flag;
+            },
+            /*
+             * 获取表单数据
+             * @return string  格式:id=0&name=aa
+             * */
+            getFormData(data) {
+                let myData = Util._.defaultsDeep({}, data);
+                return myData;
+            },
+            close() {
+                this.$emit("cancel", "add");
+            },
+            /*
+             * 打开指定的模态窗体
+             * @param options string 当前指定的模态:"add"、"edit"
+             * */
+            openModel(options) {
+                this[options + "Modal"] = true;
+            },
+            // 取消
+            cancel(targer) {
+                this[targer + "Modal"] = false;
+            }
+        },
+        created() {
+            this.init();
+        },
+        mounted() {
+        },
+        watch: {
+            formValidate: {
+                handler (curVal, oldVal) {
+                    console.log(curVal.startTime)
+                    console.log(new Date())
+                    console.log(curVal.startTime < new Date())
+                    if (curVal.startTime < new Date()) {
+                        curVal.startTime = new Date()
+                    }
+                },
+                deep: true,
+            },
+        },
+        components: {
+            addZn, dateGroup,
+        }
+    };
+</script>
+<style lang="scss">
+    .ctta-content {
+        .el-input,
+        .el-select,
+        .el-textarea {
+            width: 100%;
+        }
+    }
+</style>
+

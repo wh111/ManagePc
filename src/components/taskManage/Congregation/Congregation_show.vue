@@ -1,0 +1,385 @@
+<!--
+****--@file     topicCollection_show
+****--@date     2017/12/4 下午6:18
+****--@author   jhd
+****--@describe   查看众包组题
+-->
+<template>
+    <div class="ctcs-content">
+        <el-form ref="formValidate" :model="formValidate" label-width="100px">
+            <el-form-item prop="name" label="任务名称:">
+                {{ formValidate.name }}
+            </el-form-item>
+            <el-form-item prop="" label="任务类型:">
+                众包组题
+            </el-form-item>
+            <el-form-item prop="" label="发布者:">
+                系统
+            </el-form-item>
+            <el-form-item prop="beginTime" label="开始时间:">
+              {{ formValidate.beginTime | formatDate('yyyy-MM-dd HH:mm') }}
+            </el-form-item>
+            <el-form-item prop="endTime" label="结束时间:">
+              {{ formValidate.endTime | formatDate('yyyy-MM-dd HH:mm') }}
+            </el-form-item>
+            <el-form-item label="教材:" prop="textbookVersionId">
+                {{ formValidate.textbookVersionName }}
+            </el-form-item>
+            <el-form-item label="年级:" prop="grade">
+                {{ formValidate.grade | grade }}
+            </el-form-item>
+            <el-form-item label="科目:" prop="subject">
+                {{ formValidate.subject | subject }}
+            </el-form-item>
+            <el-form-item label="学期:" prop="term">
+                {{ formValidate.term | term }}
+            </el-form-item>
+            <!--<el-form-item label="知识点">-->
+            <!--<el-select @change="showKnowledgeIds" v-model="knowledgeIds" filterable placeholder="请选择">-->
+            <!--<el-option v-for="item in knowledgeIdArr" :key="item.id" :label="item.name" :value="item"></el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
+            <el-form-item label="已选择知识点:">
+              <el-tag style="margin-right: 5px" v-for="tag in formValidate.knowledgeList" :key="tag.id">
+                    {{tag.knowledgeName}}
+                </el-tag>
+            </el-form-item>
+            <el-form-item label="奖励积分" prop="integral">
+                {{ formValidate.integral }}
+                积分
+            </el-form-item>
+            <el-form-item prop="remark" label="编制标准:">
+                {{ formValidate.remark }}
+            </el-form-item>
+        </el-form>
+        <div id="myTable" ref="myTable">
+            <el-table align="center" :data="dataList" tooltip-effect="dark"
+                      style="width: 100%">
+                <el-table-column label="上传者" align="center" prop="teacherName" show-overflow-tooltip></el-table-column>
+                <el-table-column label="题目" align="center" prop="title" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <div class="imgSize" v-html="scope.row.title  || '——' "></div>
+                        <!--{{ scope.row.title || '——' }}-->
+                    </template>
+                </el-table-column>
+                <el-table-column label="时间" align="center" show-overflowjttg-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.createTime | formatDate('yyyy-MM-dd HH:mm') }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="状态" align="center" prop="selectStatus" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        {{ scope.row.status | selectStatus }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="240">
+                    <template slot-scope="scope">
+                        <el-button size="small" type="success" @click="show(scope.row)">查看</el-button>
+                        <el-button :disabled="scope.row.status != '0'" size="small" type="warning"
+                                   @click="start(scope.row)">收录
+                        </el-button>
+                        <el-button :disabled="scope.row.status != '0'" size="small" type="warning"
+                                   @click="stop(scope.row)">驳回
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+          <div style="margin: 10px 50px 10px 0;">
+            <div style="float: right">
+              <el-pagination
+                @size-change="changePageSize"
+                @current-change="changePage"
+                :current-page.sync="myPages.currentPage"
+                :page-size="myPages.pageSize"
+                layout="total,prev, pager, next, jumper"
+                :total="totalCount">
+              </el-pagination>
+            </div>
+          </div>
+        </div>
+        <p style="text-align: center">
+            <el-button size="small" @click="cancle">关闭</el-button>
+        </p>
+        <Modal :mask-closable="false" width="600" v-model="editModal" title="收录" class-name="vertical-center-modal"
+               :loading="loading">
+            <modal-header slot="header" :content="editId"></modal-header>
+            <el-form :rules="rules" ref="submitData" :model="submitData">
+                <p>To {{ user }}</p>
+                <el-form-item v-if="!isStop" prop="msg">
+                    <el-input :rows="4" type="textarea" placeholder="请输入"
+                              v-model="submitData.msg"></el-input>
+                </el-form-item>
+                <el-form-item v-else prop="msg">
+                    <el-input :rows="4" type="textarea" placeholder="请输入"
+                              v-model="submitData.msg"></el-input>
+                </el-form-item>
+                <el-form-item style="text-align: center">
+                    <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+                </el-form-item>
+            </el-form>
+            <div slot="footer"></div>
+        </Modal>
+        <!--查看试题-->
+        <Modal :mask-closable="false" width="1000" v-model="showModal" title="查看试题" class-name="vertical-center-modal"
+               :loading="loading">
+            <modal-header slot="header" :content="showId"></modal-header>
+            <show v-if="showModal" @cancel="cancel" @show="subCallback" :operaility-data="questionData"></show>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
+</template>
+<script>
+    /*当前组件必要引入*/
+    //引入表单验证规则
+    import {CongregationModify as rules} from "../rules";
+    import show from "../../questionsCenter/questionsManagement/questionsManagement_show.vue";
+    //当前组件引入全局的util
+
+    let Util = null;
+    import api from './../Congregation/api'
+
+    export default {
+        props: ["operailityData"],
+        data() {
+            return {
+                dataList: [],
+                rules,
+                totalCount: 0,
+                knowledgeIdArr: [],
+                subjectList: [],
+                textbook: [],
+                knowledgeIds: '',
+                isStop: false,
+                loading: false,
+                knowledgeList: [],
+                user: '',
+                loadBtn: {
+                    title: "提交",
+                    callParEvent: "listenSubEvent"
+                },
+                formValidate: {
+                    name: "",
+                    types: '1',
+                    remark: "",
+                    beginTime: "",
+                    endTime: "",
+                    integral: "",
+                    textbookVersionId: "",
+                    knowledgeIds: "",
+                    subject: "",
+                    term: "0",
+                    grade: "1"
+                },
+                questionData: {},
+                pickerOptions0: {
+                    //选择开始时间后设置结束日期的限制
+                    disabledDate: time => {
+                        return time.getTime() <= new Date()
+                    },
+                },
+                submitData: {
+                    id: "",
+                    selectStatus: "",
+                    teacherId: "",
+                    msg: ""
+                },
+                editId: {
+                    id: "edit",
+                    title: "修改"
+                },
+                showId: {
+                    id: "show",
+                    title: "查看试题"
+                },
+                editMessTitle: {
+                    type: "edit",
+                    callback: "close",
+                    successTitle: "操作成功!",
+                    errorTitle: "操作失败!",
+                    ajaxSuccess: res => {
+                        this.editModal = false;
+                        if (res.status.code != "0") return false;
+                        this.successMess("操作成功!");
+                        this.init();
+                    },
+                    ajaxError: "ajaxError",
+                    ajaxParams: {
+                        url: api.modify.path,
+                        method: api.modify.method
+                    }
+                }
+            };
+        },
+        methods: {
+            //初始化请求列表数据
+            init() {
+                console.log(this.operailityData.id)
+                Util = this.$util;
+                this.subjectList = this.$store.getters["app/gradeMap"](12);
+                this.ajax({
+                    ajaxSuccess: res => (this.formValidate = res.data),
+                    ajaxParams: {
+                        url: '/gamesGroups/get',
+                        method: 'get',
+                        params: {
+                            id: this.operailityData.id,
+                        },
+                    }
+                });
+                this.myPages = this.queryQptions = {
+                    curPage: 1,
+                    pageSize: Util.pageInitPrams.pageSize,
+                }
+                this.getTableList()
+
+            },
+            getTableList () {
+                let params = {}
+                params = Util._.defaultsDeep({}, this.myPages, {gamesGroupsId: this.operailityData.id})
+                this.ajax({
+                    ajaxSuccess: res => {
+                        this.dataList = res.data.dataList
+                        //this.formValidate.term = String(this.formValidate.term);
+                        this.totalCount = res.data.totalCount
+                    },
+                    ajaxParams: {
+                        url: api.get.path,
+                        method: api.get.method,
+                        params,
+                    }
+                });
+            },
+            start(item) {
+                this.user = item.teacherName;
+                this.isStop = false;
+                this.submitData = {
+                    questionsId: item.id,
+                    status: '1',
+                    teacherId: item.teacherId,
+                    msg: '您提供的题目符合平台要求，已被录入，请继续关注本平台！',
+                    id: this.operailityData.id,
+                };
+                this.editModal = true;
+            },
+            stop(item) {
+                this.isStop = true;
+                this.user = item.teacherName;
+                this.submitData = {
+                    questionsId: item.id,
+                    status: '2',
+                    teacherId: item.teacherId,
+                    msg: '很抱歉您提供的试题未能符合平台要求，请继续关注本平台！',
+                    id: this.operailityData.id,
+                };
+                this.editModal = true;
+            },
+            /*
+                     * 点击提交按钮 监听是否提交数据
+                     * @param isLoadingFun boolean  form表单验证是否通过
+                     * */
+            listenSubEvent(isLoadingFun) {
+                let isSubmit = this.submitForm("submitData");
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+                    this.editMessTitle.ajaxParams.data = this.getFormData(this.submitData);
+                    //          console.log(this.editMessTitle.ajaxParams.data)
+                    this.ajax(this.editMessTitle, isLoadingFun);
+                }
+            },
+            /*
+                     * 点击提交按钮 监听是否验证通过
+                     * @param formName string  form表单v-model数据对象名称
+                     * @return flag boolean   form表单验证是否通过
+                     * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+                     * 获取表单数据
+                     * @return string  格式:id=0&name=aa
+                     * */
+            getFormData(data) {
+                let myData = Util._.defaultsDeep({}, data);
+                return myData;
+            },
+            cancle() {
+                this.$emit("cancel", "show");
+            },
+            show(item) {
+                this.questionData = item;
+                this.openModel("show");
+            },
+            /*
+                     * 监听子组件通讯的方法
+                     * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+                     * @param targer string example:"add"、"edit"
+                     * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+                     * 例如:errorTitle、errorTitle
+                     *addMessTitle:{
+                     *    type:'add',
+                     *    successTitle:'添加成功!',
+                     *    errorTitle:'添加失败!',
+                     *    ajaxSuccess:'ajaxSuccess',
+                     *    ajaxError:'ajaxError',
+                     *    ajaxParams:{
+                     *      url:'/role/add',
+                     *      method:'post'
+                     *    }
+                     *    }
+                     * @param udata boolean 默认false  是否不需要刷新当前表格数据
+                     * */
+            subCallback(target, title, updata) {
+                this.cancel(target);
+                if (title) {
+                    this.successMess(title);
+                }
+                if (!updata) {
+                    this.setTableData();
+                }
+            },
+            /*
+                     * 打开指定的模态窗体
+                     * @param options string 当前指定的模态:"add"、"edit"
+                     * */
+            openModel(options) {
+                this[options + "Modal"] = true;
+            },
+            /*
+                     * 监听子组件通讯的方法
+                     * 作用:根据不同的参数关闭对应的模态
+                     * @param targer string example:"add"、"edit"
+                     * */
+            cancel(targer) {
+                this[targer + "Modal"] = false;
+            }
+        },
+        created() {
+            this.init();
+        },
+        mounted() {
+        },
+        components: {
+            show
+        }
+    };
+</script>
+<style lang="scss">
+  /*.ctcs-content {*/
+  /*.el-input,*/
+  /*.el-textarea {*/
+  /*width: 50px;*/
+  /*}*/
+  /*}*/
+  .imgSize img {
+      width: 100% !important;
+  }
+</style>
+

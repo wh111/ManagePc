@@ -1,0 +1,243 @@
+<template>
+    <div id="content" class="cusa_content">
+        <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="140px">
+            <el-form-item label="姓名：" prop="name">
+                <el-input size="small" v-model="formValidate.name"></el-input>
+            </el-form-item>
+            <el-form-item label="性别：" prop="sex">
+                <el-select size="small" v-model="formValidate.sex" placeholder="请选择">
+                    <el-option label="男" value="0"></el-option>
+                    <el-option label="女" value="1"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="生日：" prop="birth">
+                <el-date-picker
+                        v-model="formValidate.birth"
+                        type="date"
+                        :editable="false"
+                        value-format="yyyy-MM-dd"
+                        :picker-options="pickerOptions0"
+                        placeholder="选择时间" @change="changeBirth">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="学生账号：" prop="account">
+                <el-input size="small" v-model="formValidate.account" placeholder="请输入字母或数字"></el-input>
+            </el-form-item>
+            <el-form-item label="QQ号：" prop="qq">
+                <el-input size="small" v-model="formValidate.qq"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号：" prop="mobile">
+                <el-input size="small" v-model="formValidate.mobile"></el-input>
+            </el-form-item>
+            <el-form-item label="微信号：" prop="wechat">
+                <el-input size="small" v-model="formValidate.wechat"></el-input>
+            </el-form-item>
+            <el-form-item label="所属学校：" prop="school">
+                <el-input size="small" v-model="formValidate.school"></el-input>
+            </el-form-item>
+            <!--<el-form-item label="阶段：" prop="stage">-->
+            <!--<el-select size="small" v-model="formValidate.stage" placeholder="请选择" @change="stageChange">-->
+            <!--<el-option label="小学" value="0"></el-option>-->
+            <!--<el-option label="初中" value="1"></el-option>-->
+            <!--<el-option label="高中" value="2"></el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
+            <el-form-item label="年级：" prop="grade">
+                <el-select size="small" @change="fn" v-model="formValidate.grade" placeholder="请选择">
+                    <grade-option-list></grade-option-list>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="使用教材：" prop="textbookVersionList">
+                <el-form-item :label="item.subject | subject" prop="project" label-width="70px"
+                              class="useSubject" v-for="(item,index) in formValidate.textbookVersionList" :key="index">
+                    <el-select size="small" v-model="item.textbookVersionId" placeholder="请选择">
+                        <el-option v-for="(item,index) in list " :key="item.id" :label="item.name"
+                                   :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form-item>
+            <el-form-item label="学制：" prop="length">
+                <el-select :disabled="formValidate.grade > 9" size="small" v-model="formValidate.length"
+                           placeholder="请选择">
+                    <el-option label="五四制" value="1"></el-option>
+                    <el-option label="六三制" value="0"></el-option>
+                </el-select>
+            </el-form-item>
+            <!--<el-form-item label="所在市区：" prop="province">-->
+            <distpicker label-width="140px" @selected="getArea" :province="select.province" :city="select.city"
+                        :area="select.area"></distpicker>
+            <!--</el-form-item>-->
+        </el-form>
+        <p style="text-align: center">
+            <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+          <el-button size="small" class="tableMakeItemCancel" @click="cancel">取消</el-button>
+        </p>
+    </div>
+</template>
+<script>
+    // import VDistpicker from 'v-distpicker' //地区选择器
+    import distpicker from '../../common/distpicker/index';
+    import gradeOptionList from '../../common/gradeOption.vue'
+    let Util = null;
+    import api from './api'
+    import {add as rules} from './rules'
+
+    export default {
+        props: ['textbookLsit'],
+        data() {
+            return {
+                pickerOptions0: {
+                    //选择开始时间后设置结束日期的限制
+                    disabledDate: (time) => {
+                        return time.getTime() >= Date.now();
+                    }
+                },
+                rules,
+//                textbookLsit: this.textbookLsit,
+                loadBtn: {title: "提交", callParEvent: "listenSubEvent"},
+                formValidate: {
+                    name: '',//姓名
+                    account: '',//学生账号
+                    sex: '0',//性别
+                    birth: '',//生日
+                    mobile: '',//手机
+                    wechat: '',//微信
+                    qq: '',//QQ
+                    textbookVersionList: [],//教材版本
+//                    stage: '0',//阶段
+                    grade: '1',//年级
+                    length: '0',//学制
+                    school: '',//学校
+                    province: '山东省',//省
+                    town: '济南市',//市
+                    county: '历下区',//县
+                },
+                list: [],//书本类型
+                select: {province: "山东省", city: '济南市', area: '历下区'},
+                addMessTitle: {
+                    type: 'add',
+                    successTitle: '添加成功!',
+                    errorTitle: '添加失败!',
+                    ajaxSuccess: res => this.$emit('add', 'add', '添加成功!'),
+                    ajaxError: 'ajaxError',
+                    ajaxParams: {
+                        jsonString: true,
+                        url: api.add.path,
+                        method: api.add.method
+                    }
+                },
+                gradeList: [],
+            }
+        },
+        created() {
+            this.init();
+            this.list = this.$store.state.app.envs.textBookVersionList
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                let gradeList = this.$store.getters['app/gradeMap'](1)
+                this.gradeList = gradeList
+                let thisGrade = []
+                gradeList.map(item => thisGrade.push({
+                    subject: item.code,
+                    textbookVersionId: '',
+                }))
+                this.formValidate.textbookVersionList = thisGrade
+            },
+            fn (index) {
+                let gradeList = this.$store.getters['app/gradeMap'](index)
+                this.gradeList = gradeList
+                let thisGrade = []
+                gradeList.map(item => thisGrade.push({
+                    subject: item.code,
+                    textbookVersionId: '',
+                }))
+                this.formValidate.textbookVersionList = thisGrade
+            },
+            stageChange() {
+                if (this.formValidate.stage == '0') {
+                    this.formValidate.grade = '1'
+                } else if (this.formValidate.stage == '1') {
+                    this.formValidate.grade = '7'
+                } else {
+                    this.formValidate.grade = '10'
+                }
+            },
+            changeBirth(val) {
+                this.formValidate.birth = val
+            },
+            cancel() {
+                this.$emit('cancel', 'add')
+            },
+            getArea(val) {
+                this.formValidate.province = val.province.value;
+                this.formValidate.town = val.city.value;
+                this.formValidate.county = val.area.value;
+            },
+            /*
+              * 点击提交按钮 监听是否验证通过
+              * @param formName string  form表单v-model数据对象名称
+              * @return flag boolean   form表单验证是否通过
+              * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 点击提交按钮 监听是否提交数据
+            * @param isLoadingFun boolean  form表单验证是否通过
+            * */
+            listenSubEvent(isLoadingFun) {
+                var that = this
+
+                for (var i = 0; i < this.formValidate.textbookVersionList.length; i++) {
+                    if (!this.formValidate.textbookVersionList[i].textbookVersionId) {
+                        that.errorMess('请完善教材信息')
+                        return false
+
+                    }
+                }
+                let isSubmit = this.submitForm("formValidate");
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+                    this.addMessTitle.ajaxParams.data = this.getFormData(this.formValidate);
+                    this.ajax(this.addMessTitle, isLoadingFun);
+                }
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = Util._.defaultsDeep({}, data);
+                return myData;
+            }
+        },
+        components: {
+            distpicker,
+            gradeOptionList
+        }
+    }
+</script>
+<style lang="scss">
+    .cusa_content {
+        position: relative;
+        .el-form {
+            .el-input {
+                width: 300px;
+            }
+            width: 800px;
+        }
+    }
+
+</style>
+
+

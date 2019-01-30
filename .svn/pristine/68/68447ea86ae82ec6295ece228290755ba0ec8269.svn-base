@@ -1,0 +1,171 @@
+<!--
+****--@file     auditProcess
+****--@date     2017/12/6 15:05
+****--@author   YC
+****--@describe 商品审核流程
+-->
+<template>
+    <div class="auditProcessBox">
+        <div id="apChart" class="apChart"></div>
+        <el-table align="center" :data="tableData" tooltip-effect="dark" style="width: 100%">
+            <el-table-column label="审批人" prop="userName" show-overflow-tooltip align="center"></el-table-column>
+            <el-table-column label="审批时间" prop="times" show-overflow-tooltip align="center">
+                <template slot-scope="scope">
+                    {{ scope.row.times | formatDate('yyyy-MM-dd HH:mm') }}
+                </template>
+            </el-table-column>
+            <el-table-column label="审批结果" prop="result" show-overflow-tooltip align="center">
+                <template slot-scope="scope">
+                    {{ scope.row.result | auditProcessResult }}
+                </template>
+            </el-table-column>
+            <el-table-column label="审批意见" prop="suggestion" show-overflow-tooltip></el-table-column>
+        </el-table>
+    </div>
+</template>
+<style lang="scss">
+    .auditProcessBox {
+        background-color: #fff;
+        .apChart {
+            width: 780px;
+            height: 76px;
+            margin: 30px auto;
+            outline: none !important;
+            canvas {
+                outline: none !important;
+            }
+        }
+    }
+</style>
+<script>
+    /*当前组件必要引入*/
+    import Raphael from 'raphael';
+    //当前组件引入全局的util
+    let Util = null;
+    export default {
+        props: ['id'],
+        data() {
+            return {
+                chart: [], // 图
+                tableData: [] // 表格
+            }
+        },
+        methods: {
+            //初始化请求列表数据
+            init() {
+                this.getShowData()
+            },
+            // 获取数据
+            getShowData() {
+                let opt = {
+                    ajaxSuccess: res => this.getShowDataSuccess(res.data),
+                    ajaxParams: {
+                        url: 'auditRecord/list',
+                        method: 'get',
+                        params: {
+                            productId: this.id
+                        }
+                    }
+                };
+                this.ajax(opt)
+            },
+            getShowDataSuccess(res = []) {
+                let chart = [],
+                    tableData = [];
+                let step = ['First', 'Middle'];
+                res.map(item => {
+                    // if (~step.indexOf(item.types)) {
+                    chart.push(item)
+                    // }
+                    if (item.result) {
+                        tableData.push(item)
+                    }
+                })
+                this.chart = chart;
+                this.tableData = tableData;
+
+                this.createdChart()
+            },
+            // 绘图
+            createdChart() {
+                this.$nextTick(() => {
+                    let myDisplay = new FlowDisplay('apChart');// 流程图显示器
+                    let flowPath = '1';// 步骤的id，最后一个步骤为"待处理"或"已完成"的步骤
+                    let isCompleted = false;// "待处理"或"已结束"
+
+                    let chartData = {
+                        "class": "go.GraphLinksModel",
+                        "modelData": {"position": "0 -5"},
+                        "nodeDataArray": [
+                            {
+                                "key": "1",
+                                "text": "上报",
+                                "figure": "Circle",
+                                "fill": "#4fba4f",
+                                "stepType": 1,
+                                "loc": "90 50"
+                            },
+                            {
+                                "key": "2",
+                                "text": "发布",
+                                "figure": "Circle",
+                                "fill": "#CE0620",
+                                "stepType": 4,
+                                "loc": "770 50"
+                            },
+                            {"key": "3", "text": "一级审核", "loc": "260 50", "remark": ""},
+                            {"key": "4", "text": "二级审核", "loc": "450 50", "remark": ""},
+                            {"key": "5", "text": "三级审核  ", "loc": "630 50", "remark": ""}
+                        ],
+                        "linkDataArray": [
+                            {"from": "1", "to": "3", "text": "上报"},
+                            {"from": "3", "to": "4", "text": "通过"},
+                            {"from": "4", "to": "5", "text": "通过"},
+                            {"from": "5", "to": "2", "text": "通过"}
+                            // {"from": "4", "to": "1", "text": "不通过"}
+                        ]
+                    };
+                    let step = [];
+
+                    let d = this.chart;
+                    d.sort((a, b) => a.seq > b.seq);
+                    for (let i = 0, l = d.length, item; i < l; i++) {
+                        item = d[i];
+                        if (item.seq == 5) {
+                            item.seq = 2;
+                        } else if (item.seq > 1) {
+                            item.seq++
+                        }
+                        step.push(item.seq);
+                        if (item.result == 'Reject') {
+                            chartData.linkDataArray.push(
+                                {"from": item.seq, "to": "1", "text": "不通过"}
+                            )
+                            step.push(1);
+                            break
+                        }
+                        if (!item.result) {
+                            break
+                        }
+                    }
+
+                    if (step.length) {
+                        flowPath = step.join(',')
+                    }
+                    // flowPath = '3,4,5,2'
+                    console.log(flowPath)
+
+                    myDisplay.loadFlow(chartData);// 显示流程图
+                    myDisplay.animateFlowPath(flowPath, isCompleted);// 动画显示流程路径
+                })
+            }
+        },
+        created() {
+            this.init();
+        },
+        mounted() {
+        },
+        components: {}
+    }
+
+</script>

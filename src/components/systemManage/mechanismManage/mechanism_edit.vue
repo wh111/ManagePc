@@ -1,0 +1,246 @@
+<template>
+    <el-row class="smm_box">
+        <el-form ref="formValidate" :model="formValidate" :rules="rules" label-width="160px">
+            <h3>基本信息</h3>
+            <el-form-item label="机构名称：" prop="title">
+                <el-input v-model="formValidate.title"></el-input>
+            </el-form-item>
+            <el-form-item label="机构地址：" prop="address">
+                <el-input v-model="formValidate.address"></el-input>
+            </el-form-item>
+            <el-form-item label="联系人：" prop="contacts">
+                <el-input v-model="formValidate.contacts"></el-input>
+            </el-form-item>
+            <el-form-item label="手机：" prop="mobile">
+                <el-input v-model="formValidate.mobile"></el-input>
+            </el-form-item>
+            <el-form-item label="电话：" prop="telephone">
+                <el-input v-model="formValidate.telephone"></el-input>
+            </el-form-item>
+            <el-form-item label="国家：" prop="country">
+                <el-select v-model="formValidate.country" placeholder="请选择">
+                    <el-option label="中国" value="中国"></el-option>
+                    <el-option label="国外" value="国外" disabled></el-option>
+                </el-select>
+            </el-form-item>
+            <!--<el-form-item label="省份：" prop="province">-->
+            <!--<el-select v-model="formValidate.province" placeholder="请选择">-->
+            <!--<el-option label="北京" value="北京"></el-option>-->
+            <!--<el-option label="山东" value="山东"></el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="市县：" prop="city">-->
+            <!--<el-select v-model="formValidate.city" placeholder="请选择">-->
+            <!--<el-option label="朝阳区" value="朝阳区"></el-option>-->
+            <!--<el-option label="海淀区" value="海淀区"></el-option>-->
+            <!--<el-option label="通州" value="通州"></el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
+            <distpicker label-width="160px" @selected="getArea" :province="select.province" :city="select.city"
+                        :area="select.area" ref="distpicker" :rules="distpickerRules"></distpicker>
+            <el-form-item label="邮编：" prop="postcode">
+                <el-input v-model="formValidate.postcode"></el-input>
+            </el-form-item>
+            <el-form-item label="机构级别：" prop="orgLevel">
+                <el-select v-model="formValidate.orgLevel" placeholder="请选择">
+                    <el-option label="企业" value="0"></el-option>
+                    <el-option label="学校" value="1"></el-option>
+                    <el-option label="出版社" value="2"></el-option>
+                    <el-option label="教育机构" value="3"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="行业级别：" prop="proLevel">
+                <el-select v-model="formValidate.proLevel" placeholder="请选择">
+                    <el-option label="小学" value="0"></el-option>
+                    <el-option label="初中" value="1"></el-option>
+                    <el-option label="高中" value="2"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="重要级别：" prop="impLevel">
+                <el-select v-model="formValidate.impLevel" placeholder="请选择">
+                    <el-option label="一般" value="0"></el-option>
+                    <el-option label="重要" value="1"></el-option>
+                    <el-option label="非常重要" value="2"></el-option>
+                </el-select>
+            </el-form-item>
+            <h3>其他信息</h3>
+            <el-form-item label="经办人：" prop="operator">
+                <el-input v-model="formValidate.operator"></el-input>
+            </el-form-item>
+            <el-form-item label="年费：" prop="yearFee">
+                <el-input v-model="formValidate.yearFee"></el-input>
+            </el-form-item>
+            <el-form-item label="经办时间：" prop="startTime">
+                <el-date-picker type="date" placeholder="选择日期" v-model="formValidate.startTime"
+                                :editable="false"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="截止时间：" prop="endTime">
+                <el-date-picker type="date" placeholder="选择日期" v-model="formValidate.endTime"
+                                :editable="false"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="审核状态：" prop="auditStatus">
+                <el-select v-model="formValidate.auditStatus" placeholder="请选择">
+                    <el-option label="未审核" value="0"></el-option>
+                    <el-option label="审核通过" value="1"></el-option>
+                    <el-option label="审核驳回" value="2"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="备注信息：" prop="remark">
+                <el-input :rows="4" type="textarea" v-model="formValidate.remark"></el-input>
+            </el-form-item>
+            <el-col align="center">
+                <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+              <el-button class="tableMakeItemCancel" @click="cancel">取消</el-button>
+            </el-col>
+        </el-form>
+    </el-row>
+</template>
+<script>
+    import api from './api';
+    import {mechanismManage as rules, distpickerRules} from '../rules';
+    import distpicker from '../../common/distpicker/index'
+
+    let Util = null;
+    export default {
+        props: ['operailityData'],
+        data() {
+            return {
+                rules,
+                distpickerRules,
+                formValidate: {
+                    id: "",
+                    title: '',//机构名称
+                    address: '',//机构地址
+                    contacts: '',//联系人
+                    mobile: '',//手机
+                    telephone: '',//电话
+                    country: '',//国家
+                    province: '',//省
+                    city: '',//市
+                    county: '', // 县
+                    postcode: '',//邮编
+                    orgLevel: '',//机构级别
+                    proLevel: '',//行业级别
+                    impLevel: '',//重要级别
+                    operator: '',//经办人
+                    yearFee: '',//年费
+                    startTime: '',//经办时间
+                    endTime: '',//截止时间
+                    auditStatus: '',//状态
+                    remark: ''//备注
+                },
+                select: {province: "", city: '', area: ''},
+                //保存按钮基本信息
+                loadBtn: {
+                    title: '保存',
+                    callParEvent: 'listenSubEvent'
+                }
+            }
+        },
+        created() {
+            this.getShowData()
+        },
+        methods: {
+            cancel() {
+                this.$emit('cancel', 'edit')
+            },
+            getShowData() {
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (res.data instanceof Object) {
+                            for (let key in this.formValidate) {
+                                this.formValidate[key] = res.data[key]
+                            }
+                            this.formValidate.auditStatus = (res.data.auditStatus || '0').toString();
+
+                            for (let key in this.select) {
+                                res.data[key] && (this.select[key] = res.data[key])
+                            }
+                            this.select.area = res.data.county
+                        }
+                    },
+                    ajaxParams: {
+                        url: api.get.path,
+                        params: {
+                            id: this.operailityData.id
+                        }
+                    }
+                };
+                this.ajax(opt)
+            },
+            /***************************************** 提交处理 **********************************************************************/
+            /*
+             * 点击提交按钮 监听是否提交数据
+             * @param isLoadingFun boolean  form表单验证是否通过
+             * */
+            listenSubEvent(isLoadingFun) {
+                let isSubmit = this.submitForm("formValidate");
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+                    let data = this.$util.getFormData(this.formValidate);
+                    data.startTime = this.conductDate(data.startTime, 'yyyy-MM-dd') || '';
+                    data.endTime = this.conductDate(data.endTime, 'yyyy-MM-dd') || '';
+
+                    let opt = {
+                        type: 'edit',
+                        errorTitle: '修改失败!',
+                        ajaxSuccess: res => this.$emit('edit', 'edit', '修改成功!'),
+                        ajaxError: 'ajaxError',
+                        ajaxParams: {
+                            url: api.edit.path,
+                            method: api.edit.method,
+                            data
+                        }
+                    };
+                    this.ajax(opt, isLoadingFun)
+                } else {
+                    this.errorMess('资料填写有错误，不能提交！')
+                }
+            }
+            ,
+            /*
+             * 点击提交按钮 监听是否验证通过
+             * @param formName string  form表单v-model数据对象名称
+             * @return flag boolean   form表单验证是否通过
+             * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                let distpicker = this.$refs.distpicker.checkedData();
+                return flag && distpicker;
+            },
+            getArea(val) {
+                console.log(val)
+                this.formValidate.province = val.province.value;
+                this.formValidate.city = val.city.value;
+                this.formValidate.county = val.area.value;
+            }
+        },
+        components: {distpicker}
+    }
+</script>
+<style lang="scss">
+    .smm_box {
+        h3 {
+            padding-left: 50px;
+            line-height: 50px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .el-input {
+            width: 400px;
+        }
+
+        .el-date-editor--date {
+            width: 300px !important;
+        }
+    }
+</style>
+

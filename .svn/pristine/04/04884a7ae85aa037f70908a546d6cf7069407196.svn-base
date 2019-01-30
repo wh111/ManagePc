@@ -1,0 +1,257 @@
+<template>
+    <div class="cs_moudle-head" :class="{'noAll':!hasAll}">
+      <p v-if="~showItem.indexOf('textbookVersion')"><b>教材：</b>
+            <span v-if="hasAll" @click="changeMoudle('textbookVersion')"
+                  :class="select.textbookVersion == '' ? 'is-active' : ''">全部</span>
+            <span v-for="(item,id) in textbookVersionList" :key="id"
+                  :class="select.textbookVersion == id ? 'is-active' : ''"
+                  @click="changeMoudle('textbookVersion',id)"><i></i>{{item.name}}</span>
+            <template v-if="!hasAll && !textbookVersionList">
+                暂无教材
+            </template>
+        </p>
+      <p v-if="~showItem.indexOf('grade')"><b>年级：</b>
+            <span v-if="hasAll" @click="changeMoudle('grade')" :class="select.grade === '' ? 'is-active' : ''">全部</span>
+            <span v-for="index in 12" :key="index"
+                  :class="select.grade == index ? 'is-active' : ''"
+                  @click="changeMoudle('grade',index)"><i></i>{{ index | grade }}</span>
+        </p>
+      <p v-if="~showItem.indexOf('subject')"><b>科目：</b>
+            <span v-if="hasAll" @click="changeMoudle('subject')"
+                  :class="select.subject == '' ? 'is-active' : ''">全部</span>
+            <span v-for="(item,id) in subjectList" :key="id"
+                  :class="select.subject == item.code ? 'is-active' : ''"
+                  @click="changeMoudle('subject',item.code)"><i></i>{{ item.value }}</span>
+            <template v-if="!hasAll && !subjectList">
+                暂无科目
+            </template>
+        </p>
+      <p v-if="~showItem.indexOf('term')"><b>学期：</b>
+            <span v-if="hasAll" @click="changeMoudle('term')" :class="select.term === '' ? 'is-active' : ''">全部</span>
+            <span v-for="index in 2" :key="index"
+                  :class="select.term === (index - 1) ? 'is-active' : ''"
+                  @click="changeMoudle('term',index - 1)"><i></i>{{ (index - 1) | term }}</span>
+        </p>
+      <p v-if="~showItem.indexOf('chapter')"><b>章节：</b>
+            <span v-if="hasAll" @click="changeMoudle('chapter')"
+                  :class="select.chapter == '' ? 'is-active' : ''">全部</span>
+            <span v-for="(item,id) in chapterList" :key="id"
+                  :class="select.chapter == id ? 'is-active' : ''"
+                  @click="changeMoudle('chapter',id)"><i></i>{{ item.name }}</span>
+            <template v-if="!hasAll && !chapterList">
+                暂无章节
+            </template>
+        </p>
+    </div>
+</template>
+<script>
+  export default {
+    props: {
+      showItems: { // 显示项 --> ['textbookVersion']
+        type: Array,
+        default: () => []
+      },
+      selectItems: { // 初始化选中项 --> {textbookVersion:id}
+        type: Object,
+        default: () => ({})
+      },
+      disSel: { // 不可重新选择的项
+        type: Array,
+        default: () => []
+      },
+      hasAll: { // 是否有“全部”
+        type: Boolean,
+        default: true
+      }
+    },
+    data () {
+      return {
+        // 缓存所有的科目
+        allSubject: {},
+        // 缓存所有章节
+        allChapter: {},
+        // 显示项
+        showItem: ['textbookVersion', 'grade', 'term', 'subject', 'chapter'],
+        getDataItem: ['textbookVersion'],
+        // 待选项
+        textbookVersionList: null, // 教材
+        subjectList: null, // 科目
+        chapterList: null, // 章节
+        // 选中项
+        select: { // 选中数据
+          textbookVersion: '', // 教材
+          grade: '', // 年级
+          term: '', // 学期
+          subject: '', // 科目
+          chapter: '' // 章节
+        },
+        // 接口
+        api: {
+          textbookVersion: 'textbook/version/all',
+          chapter: 'textbookContent/queryChapterList'
+        }
+      }
+    },
+    methods: {
+      // 初始化
+      init () {
+        let intSel = false
+        for (let key in this.selectItems) {
+          this.select[key] = this.selectItems[key]
+          if (key === 'grade') {
+            this.changeGradeCall()
+          }
+          intSel = true
+        }
+        intSel && this.getChapterDataForServer()
+        if (this.showItems.length) {
+          this.showItem = this.showItems
+        }
+        // 初始化选择数据
+        this.showItem.map(type => ~this.getDataItem.indexOf(type) && this.getSelectDataForServer(type))
+      },
+      // 从服务器获取选择数据
+      getSelectDataForServer (type, params, call) {
+        let opt = {
+          ajaxSuccess: res => {
+            let data = {}
+            if (res.data instanceof Array && res.data.length) {
+              res.data.map(item => data[item.id] = item)
+            } else {
+              data = null
+            }
+            this[type + 'List'] = data
+            call && call(data)
+          },
+          ajaxError: () => this.errorMess('获取数据失败，请重试'),
+          ajaxParams: {
+            url: this.api[type],
+            params
+          }
+        }
+        this.ajax(opt)
+      },
+      // 获取章节
+      getChapterDataForServer () {
+        if (!~this.showItem.indexOf('chapter')) {
+          return
+        }
+        this.select.chapter = ''
+        let {textbookVersion: textbookVersionId, grade, term, subject} = this.select
+        // 教材、年级、学期、科目缺一不可
+        if (!textbookVersionId || !grade || term === '' || !subject) {
+          this.chapterList = null
+          return
+        }
+        // 缓存数据
+        let cacheKey = [textbookVersionId, grade, term, subject]
+        let cacheData = this.allChapter[cacheKey.join('-')]
+        if (cacheData) {
+          this.chapterList = this.$util.getFormData(cacheData) // 读取缓存
+        } else {
+          // 获取数据并缓存
+          this.getSelectDataForServer('chapter', {
+            textbookVersionId,
+            grade,
+            subject: this.subjectList[subject].code,
+            term
+          }, data => {
+            this.allChapter[cacheKey.join('-')] = data
+            for (let id in data) {
+              if (!this.select.chapter) {
+                this.changeMoudle('chapter', '')
+              }
+              break
+            }
+          })
+        }
+      },
+      // 选择年级后回调
+      changeGradeCall () {
+        if (!this.select.grade) {
+          this.subjectList = null
+          return
+        }
+        // 科目处理
+        this.select.subject = ''
+        if (this.allSubject[this.select.grade]) { // 缓存中是否存在该年级的科目
+          this.subjectList = this.$util.getFormData(this.allSubject[this.select.grade])
+        } else {
+          let subjectArr = this.$store.getters['app/gradeMap'](this.select.grade)
+          let subjectObj = {}
+          subjectArr.map(item => subjectObj[item.code] = item)
+          this.subjectList = subjectObj
+          this.allSubject[this.select.grade] = subjectObj
+        }
+        this.getChapterDataForServer()
+      },
+      // 选择数据
+      changeMoudle (type, id) {
+        // 是否为不允许重新选择的项
+        if (!!~this.disSel.indexOf(type)) {
+          return
+        }
+        if (this.select[type] === id && id !== '') return
+        this.select[type] = id !== undefined ? id : ''
+        // 做对应类型的回调处理
+        let callFun = this['change' + type.replace(/^\w/, type[0].toLocaleUpperCase()) + 'Call']
+        if (typeof callFun === 'function') {
+          callFun()
+        } else {
+          type !== 'chapter' && this.getChapterDataForServer()
+        }
+        let data = {}
+        this.showItem.map(type => data[type] = this.getSelectData(type))
+        this.$emit('change', data, this.select)
+      },
+      // 获取选择数据
+      getSelectData (type) {
+        // 如果有值则返回对象，否则返回空字符
+        return this[type + 'List'] && this[type + 'List'][this.select[type]] || this.select[type]
+      }
+    },
+    created () {
+      this.init()
+    }
+  }
+</script>
+<style lang="scss">
+    .cs_moudle-head {
+      b {
+        font-size: 12px;
+      }
+        width: 100%;
+      font-size: 14px;
+        background: #ffffff;
+      line-height: 24px;
+        border-bottom: 2px solid #cccccc;
+        p {
+          line-height: 24px;
+
+            padding-left: 20px;
+            span {
+                display: inline-block;
+                cursor: pointer;
+
+                i {
+                  border-right: 1px solid #e6ebf5;
+                    font-size: 12px;
+                    margin: 0 15px;
+                }
+            }
+            .is-frist {
+                border-left: none;
+            }
+            .is-active {
+              color: #11a63f;
+              font-weight: bold;
+            }
+        }
+        &.noAll {
+            p span:first-child i {
+                display: none;
+            }
+        }
+    }
+</style>
+

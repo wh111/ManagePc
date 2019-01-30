@@ -1,0 +1,334 @@
+<template>
+    <div class="moudle-wrap modal clearfix" id="content" ref="content">
+        <subject-head :showItems="['grade','subject']" @change="subjectChange"></subject-head>
+        <el-col>
+            <div>
+                <el-form :inline="true" class="demo-ruleForm" ref="formValidate">
+                    <el-row class="search-from">
+                        <el-col :span="14">
+                          <el-form-item label="测评名称：" style="margin-left: 10px">
+                                <el-input size="small" v-model="formValidate.title"
+                                          placeholder="输入测评名称进行搜索"></el-input>
+                            </el-form-item>
+                            <el-button class="search-btn" size="small" type="primary" @click="searchEvent">搜索
+                            </el-button>
+                        </el-col>
+                        <el-col :span="10" class="right" align="right">
+                            评测报告数量: {{totalCount}} 份
+                        </el-col>
+                    </el-row>
+                  <!--<el-col :span="14" style="margin-bottom:20px">-->
+                  <!---->
+                  <!--</el-col>-->
+                </el-form>
+            </div>
+
+            <div id="myTable" ref="myTable">
+                <el-table align="center" :context="self" :height="dynamicHt" :data="tableData" tooltip-effect="dark"
+                          style="width: 100%" @selection-change="handleSelectionChange">
+                  <el-table-column type="selection" width="50"></el-table-column>
+                  <el-table-column prop="index" align="center" label="序号" width="70px"
+                                   show-overflow-tooltip></el-table-column>
+                    <el-table-column label="测评名称" prop="title" show-overflow-tooltip></el-table-column>
+                    <el-table-column label="测评时间" align="center" prop="createTime"
+                                     show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ scope.row.createTime | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="结束时间" align="center" prop="updateTime"
+                                     show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            {{ (scope.row.updateTime || '-') | formatDate('yyyy-MM-dd HH:mm:ss') }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="测评者" align="center" prop="nickname"
+                                     show-overflow-tooltip></el-table-column>
+                    <el-table-column label="操作" align="center" width="210">
+                        <template slot-scope="scope">
+                          <el-button size="small" class="tableMakeItem" @click="show(scope.row)">查看</el-button>
+                          <el-button size="small" class="tableMakeItem" @click="toRemove(scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="margin: 10px 50px 10px 0;">
+                  <el-button size="small" class="deleteButton" @click="toRemove('')">批量删除</el-button>
+                    <div style="float: right;">
+                        <el-pagination
+                                @size-change="changePageSize"
+                                @current-change="changePage"
+                                :current-page.sync="myPages.currentPage"
+                                :page-size="myPages.pageSize"
+                                layout="total,prev, pager, next, jumper"
+                                :total="totalCount">
+                        </el-pagination>
+                    </div>
+                </div>
+            </div>
+        </el-col>
+
+
+        <!--查看试题-->
+        <Modal :mask-closable="false" width="1000" v-model="showModal" class-name="vertical-center-modal"
+               :loading="loading">
+            <modal-header slot="header" :content="showId"></modal-header>
+            <show v-if="showModal" :operaility-data="operailityData"></show>
+            <div slot="footer"></div>
+        </Modal>
+        <!--查看弹窗-->
+        <!-- <el-dialog title="修改" :visible.sync="showModal" width="1000px">
+            <show @cancel="cancel" @add="subCallback"></show>
+            <div slot="footer" class="dialog-footer"></div>
+        </el-dialog> -->
+    </div>
+</template>
+<script>
+    import subjectHead from '@/components/common/subjectHead.vue'
+    import show from './evaluationManagement_show.vue'
+    import api from './api'
+
+    let Util = null;
+    export default {
+        data() {
+            return {
+                //* 表格 *//
+                self: this,
+                totalCount: 0,
+                loading: false,
+                dynamicHt: 100, // 表格高度
+                multipleSelection: [],
+                operailityData: {},
+                contentAll: 0,
+                tableData: [],
+                formValidate: {
+                    subject: '',//科目
+                    grade: '',//年级1-12
+                    title: ''//题目名称
+                },
+                showId: {
+                    id: 'showId',
+                    title: '查看评测'
+                }
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            //初始化函数
+            init() {
+                Util = this.$util;
+                this.myPages = Util.pageInitPrams;
+                this.queryQptions = {
+                    url: api.list.path,
+                    params: {curPage: 1, pageSize: Util.pageInitPrams.pageSize}
+                }
+                this.setTableData()
+            },
+            /************************** 表格 ************************/
+            /*
+            * checkbox 选择后触发事件
+            * @param val Array 存在所有的选择每一个行数据
+            */
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            /*
+             * 设置表格数据
+             * @param isLoading Boolean 是否加载
+             */
+            setTableData() {
+                Object.assign(this.queryQptions.params, this.formValidate);
+                this.ajax({
+                    ajaxSuccess: 'listDataSuccess',
+                    ajaxParams: this.queryQptions
+                })
+            },
+            // 数据请求成功回调
+            listDataSuccess(res) {
+                this.totalCount = res.data.totalCount || 0;
+                this.tableData = this.addIndex(res.data.dataList || []);
+            },
+            //获取当前所选中的教材板块
+            subjectChange(obj, sel) {
+                this.formValidate.grade = sel.grade;
+                this.formValidate.subject = sel.subject;
+                this.setTableData();
+            },
+            //查看
+            show(item) {
+                this.operailityData = item;
+                this.openModel('show')
+            },
+            //搜索查询
+            searchEvent() {
+                // let isSubmit = this.handleSubmit('formValidate');
+                // if (isSubmit) {
+                this.setTableData()
+                // }
+            },
+            /*
+           * 列表查询方法
+           * @param string 查询from的id
+           * */
+            handleSubmit(name) {
+                let flag = false
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    } else {
+                        this.errorMess('表单验证失败!');
+                    }
+                })
+                return flag
+            },
+
+            //批量删除
+            toRemove(item) {
+                Util.todoConfirm({
+                    title: '确定删除评测记录？',
+                    content: {id: 'todoId', title: '删除评测记录'},
+                    data: {
+                        data: {ids: Util.getStrByArr(item ? [item] : this.multipleSelection, 'id')},
+                        api: api.remove,
+                        msg: '删除'
+                    },
+                    close: () => {//关闭后触发
+                        this.subCallback()
+                    },
+                    confirm: (result) => {
+                    }
+                })
+            },
+            //设置表格及分页的位置
+            setTableDynHeight() {
+                let content = this.$refs.content;
+                let parHt = content.parentNode.offsetHeight;
+                let myTable = this.$refs.myTable;
+                let paginationHt = 105;
+                this.dynamicHt = parHt - myTable.offsetTop - paginationHt;
+                this.$refs.myTable.style.height = this.dynamicHt + 'px';
+                // this.$refs.menu.style.height = myTable.parentNode.offsetHeight + 'px';
+            },
+            /*
+             * 打开指定的模态窗体
+             * @param options string 当前指定的模态:"add"、"edit"
+             * */
+            openModel(options) {
+                this[options + 'Modal'] = true;
+            },
+            /*
+             * 监听子组件通讯的方法
+             * 作用:根据不同的参数关闭对应的模态
+             * @param targer string example:"add"、"edit"
+             * */
+            cancel(targer) {
+                this[targer + 'Modal'] = false;
+            },
+            /*
+            * 监听子组件通讯的方法
+            * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+            * @param targer string example:"add"、"edit"
+            * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+            * 例如:errorTitle、errorTitle
+            *addMessTitle:{
+            *    type:'add',
+            *    successTitle:'添加成功!',
+            *    errorTitle:'添加失败!',
+            *    ajaxSuccess:'ajaxSuccess',
+            *    ajaxError:'ajaxError',
+            *    ajaxParams:{
+            *      url:'/role/add',
+            *      method:'post'
+            *    }
+            *    }
+            * @param udata boolean 默认false  是否不需要刷新当前表格数据
+            * */
+            subCallback(target, title, updata) {
+                target && this.cancel(target);
+                if (title) {
+                    this.successMess(title);
+                }
+                if (!updata) {
+                    this.setTableData();
+                }
+            }
+        },
+        mounted() {
+            //页面dom稳定后调用
+            this.$nextTick(function () {
+                //初始表格高度及分页位置
+                this.setTableDynHeight();
+                //为窗体绑定改变大小事件
+                let Event = Util.events;
+                Event.addHandler(window, "resize", this.setTableDynHeight);
+            })
+        },
+        components: {
+            subjectHead,
+            show
+        }
+    }
+</script>
+<style lang="scss" scoped>
+    .clearfix:after {
+        content: " ";
+        display: block;
+        clear: both;
+        height: 0;
+    }
+
+    .clearfix {
+        zoom: 1;
+    }
+
+    .right {
+        line-height: 36px;
+        font-size: 14px;
+    }
+
+    .el-menu-vertical-demo {
+        overflow: hidden;
+    }
+
+    .el-menu--dark {
+        background-color: #d8eadd;
+    }
+
+    .el-menu--dark .el-submenu .el-menu {
+        background: #ffffff;
+    }
+
+    .el-menu--dark .el-submenu .el-menu .el-menu-item:hover {
+        background: none;
+    }
+
+    .el-menu--dark .el-menu-item:hover, .el-menu--dark .el-submenu__title:hover {
+        color: #11a63f;
+        background: none;
+    }
+
+    .is-active .el-menu .is-active {
+        color: #11a63f;
+    }
+
+    .el-menu--dark .el-menu-item, .el-menu--dark .el-submenu__title {
+        color: #000;
+    }
+
+    .el-col-20 {
+        width: 86%;
+        margin-left: 1%;
+    }
+
+    #menu {
+        overflow-y: scroll;
+    }
+
+    .btn-lable {
+        font-size: 16px;
+    }
+</style>
+
+
+

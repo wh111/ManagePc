@@ -1,0 +1,103 @@
+<template>
+    <el-row>
+        <el-form ref="formValidate" :model="formValidate" :rules="rules" label-width="140px">
+            <el-form-item label="To：">
+                {{ showData.userName }}
+            </el-form-item>
+            <el-form-item label="填写反馈：" prop="reply">
+                <el-input type="textarea" :rows="4" v-model="formValidate.reply"></el-input>
+            </el-form-item>
+            <el-col align="center">
+              <el-button class="search-btn" type="success" @click="submit">确定</el-button>
+              <el-button class="tableMakeItemCancel" type="info" @click="cancel">取消</el-button>
+            </el-col>
+        </el-form>
+    </el-row>
+</template>
+<script>
+    import api from './api';
+    import {feedbackManage as rules} from '../rules';
+
+    let Util = null;
+    export default {
+        props: ['value'],
+        data() {
+            return {
+                rules,
+                showData: {
+                    userName: "",
+                    content: ""
+                },
+                formValidate: {
+                    id: this.value.operailityData.id,
+                    reply: ''
+                }
+            }
+        },
+        created() {
+            this.init()
+        },
+        methods: {
+            init() {
+                Util = this.$util;
+                this.getShowData()
+            },
+            submit() {
+                if (!this.submitForm('formValidate')) return;
+                let opt = {
+                    errorTitle: '回复失败',
+                    successTitle: '回复成功',
+                    ajaxParams: {
+                        url: api.reply.path,
+                        method: api.reply.method,
+                        data: this.getFormData(this.formValidate)
+                    }
+                };
+                this.ajax(opt)
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = this.$util._.defaultsDeep({}, data);
+                return myData;
+            },
+            getShowData() {
+                let opt = {
+                    ajaxSuccess: res => {
+                        if (res.data instanceof Object) {
+                            this.showData = res.data;
+                        }
+                    },
+                    ajaxError: () => this.errorMess('获取数据失败，请重试'),
+                    ajaxParams: {
+                        url: api.get.path,
+                        method: api.get.method,
+                        params: {
+                            id: this.value.operailityData.id
+                        }
+                    }
+                };
+                this.ajax(opt)
+            },
+            cancel() {
+                this.$emit('confirm');
+            }
+        }
+    }
+</script>

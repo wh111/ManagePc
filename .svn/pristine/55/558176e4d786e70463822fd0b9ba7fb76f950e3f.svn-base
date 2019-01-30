@@ -1,0 +1,134 @@
+<!--
+****--@file     input
+****--@date     2018/1/2 13:54
+****--@author   YC
+****--@describe 赛季编辑
+-->
+<template>
+    <el-row>
+        <el-form :rules="rules" ref="formValidate" :model="formValidate" label-width="100px">
+            <el-form-item label="赛季名称：" prop="title">
+                <el-input v-model="formValidate.title"></el-input>
+            </el-form-item>
+            <date-group :dateGroup="{text:'',startDate:formValidate.startTime,endDate:formValidate.endTime}"
+                        style="display: inline;">
+                <el-form-item slot="start" prop="startTime" label="开始时间：">
+                    <el-date-picker v-model="formValidate.startTime" type="datetime" :editable="false" style="width: 100%"
+                                    placeholder="选择时间" :picker-options="pickerOptions0"
+                                    @change="handleStartTime">
+                    </el-date-picker>
+                </el-form-item>
+                <i></i>
+                <el-form-item slot="end" prop="endTime" label="结束时间：">
+                    <el-date-picker v-model="formValidate.endTime" type="datetime" :editable="false" style="width: 100%"
+                                    placeholder="选择时间" :picker-options="pickerOptions1"
+                                    @change="handleEndTime">
+                    </el-date-picker>
+                </el-form-item>
+            </date-group>
+        </el-form>
+        <el-col align="center">
+            <load-btn @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+            <el-button @click="cancel">取消</el-button>
+        </el-col>
+    </el-row>
+</template>
+<script>
+    /*当前组件必要引入*/
+    import api from './api';
+    import { addMatch as rules } from './rules'
+    //当前组件引入全局的util
+    let Util = null;
+    export default {
+        props: ['operailityData'],
+        data() {
+            return {
+                rules,
+                loadBtn: {title: '提交', callParEvent: 'listenSubEvent'},
+                formValidate: {
+                    id: '',
+                    title: '',
+                    startTime: '',
+                    endTime: ''
+                },
+                editType: 'add'
+            }
+        },
+        methods: {
+            //初始化请求列表数据
+            init() {
+                Util = this.$util;
+                if (this.operailityData) {
+                    this.editType = 'edit';
+                    this.getEditData()
+                }
+            },
+            // 获取编辑数据
+            getEditData() {
+                this.formValidate = this.operailityData;
+                this.formValidate.startTime = new Date(this.operailityData.startTime);
+                this.formValidate.endTime = new Date(this.operailityData.endTime);
+            },
+            /*
+            * 点击提交按钮 监听是否验证通过
+            * @param formName string  form表单v-model数据对象名称
+            * @return flag boolean   form表单验证是否通过
+            * */
+            submitForm(formName) {
+                let flag = false;
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        flag = true;
+                    }
+                });
+                return flag;
+            },
+            /*
+            * 点击提交按钮 监听是否提交数据
+            * @param isLoadingFun boolean  form表单验证是否通过
+            * */
+            listenSubEvent(isLoadingFun) {
+                let isSubmit = this.submitForm("formValidate");
+                let msg = {add: '添加', edit: '修改'};
+                if (isSubmit) {
+                    if (!isLoadingFun) isLoadingFun = function () {
+                    };
+                    isLoadingFun(true);
+                    let data = this.getFormData(this.formValidate);
+                    data.startTime = new Date(data.startTime).getTime();
+                    data.endTime = new Date(data.endTime).getTime();
+                    let opt = {
+                        type: this.editType,
+                        errorTitle: msg[this.editType] + '失败!',
+                        ajaxSuccess: res => this.$emit(this.editType, this.editType, msg[this.editType] + '成功!'),
+                        ajaxError: 'ajaxError',
+                        ajaxParams: {
+                            url: api[this.editType].path,
+                            method: api[this.editType].method,
+                            data
+                        }
+                    };
+                    this.ajax(opt, isLoadingFun)
+                }
+            },
+            /*
+            * 获取表单数据
+            * @return string  格式:id=0&name=aa
+            * */
+            getFormData(data) {
+                let myData = Util._.defaultsDeep({}, data);
+                return myData;
+            },
+            cancel() {
+                this.$emit('cancel', this.editType)
+            }
+        },
+        created() {
+            this.init();
+        },
+        mounted() {
+        },
+        components: {}
+    }
+
+</script>
